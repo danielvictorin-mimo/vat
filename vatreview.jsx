@@ -13187,7 +13187,7 @@ function VATReviewFlow({ onClose, selectedPeriod = "April 2026", resolvedCards, 
                                   }, 400);
                                 }
                               }}
-                                style={{ display: "grid", gridTemplateColumns: gridTpl, borderBottom: "1px solid #E9E9EB", background: isSelected ? "#F4FBF1" : "#FFFFFF", transition: "background 0.1s", cursor: clickable ? "pointer" : "default" }}
+                                style={{ display: "grid", gridTemplateColumns: gridTpl, borderBottom: "1px solid #E9E9EB", background: isSelected ? (row.status === "Priority" ? "#FCEFEC" : "#F4FBF1") : "#FFFFFF", transition: "background 0.1s", cursor: clickable ? "pointer" : "default" }}
                                 onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = "#FAFAFA"; }}
                                 onMouseLeave={e => { if (!isSelected) e.currentTarget.style.background = "#FFFFFF"; }}>
                                 {cols.map((col, ci) => {
@@ -13304,7 +13304,7 @@ function VATReviewFlow({ onClose, selectedPeriod = "April 2026", resolvedCards, 
                     <div style={{ height: "100%", width: `${pct}%`, background: "#05A105", borderRadius: 2, transition: "width 0.4s ease" }} />
                   </div>
                 </div>
-              )}
+              </div>
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 16, padding: "0 8px" }}>
@@ -14709,7 +14709,7 @@ function VATReviewFlowV2({ onClose, selectedPeriod = "April 2026", resolvedCards
                                   }, 400);
                                 }
                               }}
-                                style={{ display: "grid", gridTemplateColumns: gridTpl, borderBottom: "1px solid #E9E9EB", background: isSelected ? "#F4FBF1" : "#FFFFFF", transition: "background 0.1s", cursor: clickable ? "pointer" : "default" }}
+                                style={{ display: "grid", gridTemplateColumns: gridTpl, borderBottom: "1px solid #E9E9EB", background: isSelected ? (row.status === "Priority" ? "#FCEFEC" : "#F4FBF1") : "#FFFFFF", transition: "background 0.1s", cursor: clickable ? "pointer" : "default" }}
                                 onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = "#FAFAFA"; }}
                                 onMouseLeave={e => { if (!isSelected) e.currentTarget.style.background = "#FFFFFF"; }}>
                                 {cols.map((col, ci) => {
