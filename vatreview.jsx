@@ -1522,11 +1522,13 @@ function RecommendationCard({
   verticalTable = false,
   hideMore = false,
   highlighted = false,
+  tertiaryLabel = null,
   onPrimaryAction,
   onFileAction,
   onSecondaryAction,
   onDangerAction,
   onIgnore,
+  onTertiaryAction,
   onMore,
 }) {
   const [expanded, setExpanded] = useState(!collapsed);
@@ -1638,6 +1640,11 @@ function RecommendationCard({
                 onMouseLeave={e => e.currentTarget.style.background = "#FCEFEC"}
                 onClick={onDangerAction || onIgnore}
               >{dangerLabel}</button>
+            )}
+            {tertiaryLabel && !isIgnored && (
+              <SecondaryButton style={{ height: 40, padding: "0 12px", fontSize: 14, borderRadius: 8 }} onClick={onTertiaryAction}>
+                {tertiaryLabel}
+              </SecondaryButton>
             )}
             <div style={{ flex: 1 }} />
             {secondaryLabel && (
@@ -7268,7 +7275,7 @@ function MainMenu({
     { label: "Collect documents",   icon: "fileQuestion" },
     { label: "Inbox",               icon: "inbox" },
     { label: "Bank reconciliation", icon: "checkVerified" },
-    { label: "VAT Review",          icon: "fileSearch" },
+    { label: "VAT & Miscodings",     icon: "fileSearch" },
     { label: "Adjustments",         icon: "switchHorizontal" },
     { label: "Profit & Loss",       icon: "calculator" },
     { label: "Balance sheet",       icon: "rows" },
@@ -7853,7 +7860,7 @@ function ExpandedRowContent({ row, comments = [], onAddComment }) {
               }}>
                 {c.user.split(" ").map(n => n[0]).join("")}
               </div>
-              <span style={{ fontSize: 13, fontWeight: 600, color: "#080908" }}>{c.user}</span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: "#080908" }}>{c.user}</span>
               <span style={{ fontSize: 13, color: "#8C8C8B" }}>{c.timestamp}</span>
             </div>
             <p style={{ fontSize: 14, lineHeight: "22px", color: "#080908", margin: 0, paddingLeft: 32 }}>{c.text}</p>
@@ -11649,6 +11656,8 @@ const VAT_ACCOUNT_TX = [
   { account: "Audit & Accountancy fees", opening: 0, rows: [
     { status: "Clear", date: "12 Apr 2026", source: "Payable Invoice", description: "Greenfield & Co — Annual audit fee", ref: "GF-2026-088", currency: "GBP", debitSrc: 6500.00, creditSrc: null, debitGbp: 6500.00, creditGbp: null, running: 6500.00, vat: "20% (VAT on Expenses)" },
     { status: "Review", cardIdx: 0, date: "28 Apr 2026", source: "Payable Invoice", description: "Greenfield & Co — Quarterly bookkeeping review", ref: "GF-2026-091", currency: "GBP", debitSrc: 1200.00, creditSrc: null, debitGbp: 1200.00, creditGbp: null, running: 7700.00, vat: "20% (VAT on Expenses)" },
+    { status: "Clear", date: "30 Apr 2026", source: "Payable Invoice", description: "Greenfield & Co — Payroll processing April", ref: "GF-2026-094", currency: "GBP", debitSrc: 450.00, creditSrc: null, debitGbp: 450.00, creditGbp: null, running: 8150.00, vat: "20% (VAT on Expenses)" },
+    { status: "Clear", date: "5 May 2026", source: "Payable Invoice", description: "Greenfield & Co — VAT return preparation", ref: "GF-2026-097", currency: "GBP", debitSrc: 380.00, creditSrc: null, debitGbp: 380.00, creditGbp: null, running: 8530.00, vat: "20% (VAT on Expenses)" },
   ] },
   { account: "Bank Fees", opening: 0, rows: [
     { status: "Clear", date: "1 Apr 2026", source: "Bank Statement", description: "Lloyds Bank — Monthly account fee", ref: "STMT-04-26", currency: "GBP", debitSrc: 25.00, creditSrc: null, debitGbp: 25.00, creditGbp: null, running: 25.00, vat: "Exempt Expenses" },
@@ -11662,6 +11671,8 @@ const VAT_ACCOUNT_TX = [
   { account: "Consulting", opening: 0, rows: [
     { status: "Review", cardIdx: 2, date: "10 Apr 2026", source: "Payable Invoice", description: "Northwind Consulting Inc. — Strategy advisory", ref: "INV-2026-0410", currency: "CAD", debitSrc: 8500.00, creditSrc: null, debitGbp: 4607.21, creditGbp: null, running: 4607.21, vat: "Reverse Charge Expenses (20%)" },
     { status: "Clear", date: "22 Apr 2026", source: "Payable Invoice", description: "Brightside Advisory Ltd — Tax planning workshop", ref: "BA-2026-0422", currency: "GBP", debitSrc: 1450.00, creditSrc: null, debitGbp: 1450.00, creditGbp: null, running: 6057.21, vat: "20% (VAT on Expenses)" },
+    { status: "Priority", date: "8 May 2026", source: "Payable Invoice", description: "Northwind Consulting Inc. — Digital transformation retainer", ref: "INV-2026-0508", currency: "CAD", debitSrc: 6200.00, creditSrc: null, debitGbp: 3622.15, creditGbp: null, running: 9679.36, vat: "Reverse Charge Expenses (20%)" },
+    { status: "Clear", date: "14 May 2026", source: "Payable Invoice", description: "Brightside Advisory Ltd — Board advisory session", ref: "BA-2026-0514", currency: "GBP", debitSrc: 900.00, creditSrc: null, debitGbp: 900.00, creditGbp: null, running: 10579.36, vat: "20% (VAT on Expenses)" },
   ] },
   { account: "Cost of Goods Sold", opening: 0, rows: [
     { status: "Clear", date: "8 Apr 2026", source: "Payable Invoice", description: "Polychemtex Inc. — Raw materials shipment", ref: "PCX-2026-0408", currency: "GBP", debitSrc: 12500.00, creditSrc: null, debitGbp: 12500.00, creditGbp: null, running: 12500.00, vat: "20% (VAT on Expenses)" },
@@ -11686,6 +11697,8 @@ const VAT_ACCOUNT_TX = [
   { account: "Light, Power, Heating", opening: 0, rows: [
     { status: "Clear", date: "6 Apr 2026", source: "Payable Invoice", description: "British Gas — Office electricity April", ref: "BG-2026-04", currency: "GBP", debitSrc: 612.00, creditSrc: null, debitGbp: 612.00, creditGbp: null, running: 612.00, vat: "5% (VAT on Expenses)" },
     { status: "Clear", date: "6 Apr 2026", source: "Payable Invoice", description: "British Gas — Gas heating April", ref: "BG-2026-04-G", currency: "GBP", debitSrc: 318.00, creditSrc: null, debitGbp: 318.00, creditGbp: null, running: 930.00, vat: "5% (VAT on Expenses)" },
+    { status: "Review", date: "6 May 2026", source: "Payable Invoice", description: "British Gas — Office electricity May", ref: "BG-2026-05", currency: "GBP", debitSrc: 589.00, creditSrc: null, debitGbp: 589.00, creditGbp: null, running: 1519.00, vat: "5% (VAT on Expenses)" },
+    { status: "Clear", date: "6 May 2026", source: "Payable Invoice", description: "British Gas — Gas heating May", ref: "BG-2026-05-G", currency: "GBP", debitSrc: 302.00, creditSrc: null, debitGbp: 302.00, creditGbp: null, running: 1821.00, vat: "5% (VAT on Expenses)" },
   ] },
   { account: "Pensions Costs", opening: 0, rows: [
     { status: "Clear", date: "25 Apr 2026", source: "Payroll", description: "Employer pension contributions — April", ref: "PEN-04-26", currency: "GBP", debitSrc: 2540.00, creditSrc: null, debitGbp: 2540.00, creditGbp: null, running: 2540.00, vat: "No VAT" },
@@ -11693,6 +11706,8 @@ const VAT_ACCOUNT_TX = [
   { account: "Postage, Freight & Courier", opening: 0, rows: [
     { status: "Clear", date: "8 Apr 2026", source: "Payable Invoice", description: "DHL Express — Outbound shipment", ref: "DHL-2026-0408", currency: "GBP", debitSrc: 145.30, creditSrc: null, debitGbp: 145.30, creditGbp: null, running: 145.30, vat: "20% (VAT on Expenses)" },
     { status: "Review", cardIdx: 1, date: "21 Apr 2026", source: "Payable Invoice", description: "Royal Mail Business — Bulk postage", ref: "RM-2026-0421", currency: "GBP", debitSrc: 88.50, creditSrc: null, debitGbp: 88.50, creditGbp: null, running: 233.80, vat: "Exempt Expenses" },
+    { status: "Clear", date: "2 May 2026", source: "Payable Invoice", description: "DHL Express — Priority parcel (EU)", ref: "DHL-2026-0502", currency: "GBP", debitSrc: 82.40, creditSrc: null, debitGbp: 82.40, creditGbp: null, running: 316.20, vat: "20% (VAT on Expenses)" },
+    { status: "Clear", date: "15 May 2026", source: "Payable Invoice", description: "DHL Express — Domestic next-day delivery", ref: "DHL-2026-0515", currency: "GBP", debitSrc: 24.80, creditSrc: null, debitGbp: 24.80, creditGbp: null, running: 341.00, vat: "20% (VAT on Expenses)" },
   ] },
   { account: "Prepayments", opening: 0, rows: [
     { status: "Clear", date: "1 Apr 2026", source: "Manual Journal", description: "Insurance prepayment — Apr to Sep", ref: "PREP-04-26", currency: "GBP", debitSrc: 4800.00, creditSrc: null, debitGbp: 4800.00, creditGbp: null, running: 4800.00, vat: "No VAT" },
@@ -11739,7 +11754,7 @@ const VAT_CARDS = [
       "VAT rate name": { text: "No VAT", strikethrough: true },
       "Suggested": "—",
     },
-    primaryLabel: "Review", secondaryLabel: null,
+    primaryLabel: "Review", secondaryLabel: null, tertiaryLabel: "Edit",
   },
   {
     idx: 1, cat: "wrong-code", score: null,
@@ -11754,7 +11769,7 @@ const VAT_CARDS = [
       "VAT rate name": { text: "20% (VAT on Expenses)", strikethrough: true },
       "Suggested": "No VAT",
     },
-    primaryLabel: "Accept", secondaryLabel: "Review",
+    primaryLabel: "Accept suggestion", secondaryLabel: "Review",
   },
   {
     idx: 2, cat: "reverse-charge", score: null,
@@ -11769,7 +11784,7 @@ const VAT_CARDS = [
       "VAT rate name": { text: "Tax on Purchases (20%)", strikethrough: true },
       "Suggested": "Reverse Charge (20%)",
     },
-    primaryLabel: "Accept", secondaryLabel: "Review",
+    primaryLabel: "Accept suggestion", secondaryLabel: "Review",
   },
   {
     idx: 3, cat: "non-reclaimable", score: null,
@@ -11784,7 +11799,7 @@ const VAT_CARDS = [
       "VAT rate name": { text: "Tax on Purchases (20%)", strikethrough: true },
       "Suggested": "Tax Exempt",
     },
-    primaryLabel: "Accept", secondaryLabel: "Review",
+    primaryLabel: "Accept suggestion", secondaryLabel: "Review",
   },
   {
     idx: 4, cat: "pva", score: null,
@@ -11799,7 +11814,7 @@ const VAT_CARDS = [
       "VAT rate name": { text: "No VAT", strikethrough: true },
       "Suggested": "Tax on Purchases (20%) (PVA)",
     },
-    primaryLabel: "Accept", secondaryLabel: "Review",
+    primaryLabel: "Accept suggestion", secondaryLabel: "Review",
   },
 ];
 
@@ -11810,6 +11825,12 @@ const VAT_NAV_CATS = [
   { key: "non-reclaimable", label: "Non-reclaimable VAT", baseIdx: 3, items: [{ contact: "The Ivy Private Dining" }] },
   { key: "pva",             label: "Postponed VAT (PVA)", baseIdx: 4, items: [{ contact: "DHL / HMRC Customs" }] },
 ];
+const VAT_CARDS_BASELINE = VAT_CARDS.slice(0, 2).map((c, i) => {
+  if (i === 0) return { ...c, title: "The posted gross doesn't match the invoice, and not by a rounding error.", contact: "DVLA", description: "DVLA (×2, March): posted £197.50, the DVLA confirmation says £195.00 — a consistent £2.50 gap. That's the DVLA card-payment surcharge, posted to the ledger but not itemised on the receipt.", tableRow: { "Contact": "DVLA", "Expense account": "710 – Motor Expenses", "Date": "Multiple – Mar 2026", "Amount": "£197.50 × 2", "Posted": "£197.50", "Confirmed": "£195.00", "Gap": "£2.50 (card surcharge)", "VAT rate name": "20% (VAT on Expenses)", "Suggested": "Review posting" } };
+  if (i === 1) return { ...c, title: "An attachment is present but isn't a normal invoice, so no total can be tied to.", contact: "EgyptAir", description: "EgyptAir (March): the attachment is an e-ticket receipt with a tax breakdown in EGP but no stated total payable — so the £600.66 posted has nothing in the document to reconcile against. Check correct handling of potential reverse charge in journal.", tableRow: { "Contact": "EgyptAir", "Expense account": "410 – Travel & Subsistence", "Date": "14 Mar 2026", "Amount": "£600.66", "Currency": "EGP → GBP", "VAT rate name": { text: "20% (VAT on Expenses)", strikethrough: true }, "Suggested": "Reverse Charge (20%)" } };
+  return c;
+});
+
 
 const VAT_CAT_LABELS = {
   "uncertain":       "Uncertain VAT",
@@ -12120,6 +12141,7 @@ function VATReviewFlow({ onClose, selectedPeriod = "April 2026", resolvedCards, 
   const [accountFilterSet, setAccountFilterSet] = useState(new Set());
   const [accountFilterOpen, setAccountFilterOpen] = useState(false);
   const [accountFilterSearch, setAccountFilterSearch] = useState("");
+  const [groupByContact, setGroupByContact] = useState(false);
   const [suggestionsBoxCollapsed, setSuggestionsBoxCollapsed] = useState(false);
   const [resolvedRowKeys, setResolvedRowKeys] = useState(new Set());
   const accountFilterBtnRef = useRef(null);
@@ -12867,32 +12889,65 @@ function VATReviewFlow({ onClose, selectedPeriod = "April 2026", resolvedCards, 
                     <h1 style={{ fontSize: 28, fontWeight: 700, color: "#000000", margin: "0 0 8px", letterSpacing: "-0.5px" }}>VAT Return</h1>
                     <p style={{ fontSize: 14, color: "#8C8C8B", margin: 0 }}>01 Apr 2026 — 30 Apr 2026</p>
                   </div>
-                  {/* 9 boxes */}
+                  {/* VAT Return Details */}
+                  <div style={{ border: "1px solid #ECECEC", borderRadius: 6, overflow: "hidden", marginBottom: 32 }}>
+                    {[
+                      { label: "Registration Number",                    value: "GB 123456789" },
+                      { label: "VAT Scheme",                             value: "Cash Scheme" },
+                      { label: "Period covered by the return",           value: "Monthly" },
+                      { label: "Late VAT Claims included",               value: "No (Previous period has not been filed)" },
+                      { label: "From",                                   value: "1 Apr 2026" },
+                      { label: "To",                                     value: "30 Apr 2026" },
+                      { label: "The deadline for submitting this return online is", value: "7 Aug 2026" },
+                    ].map(({ label, value }, i, arr) => (
+                      <div key={label} style={{ display: "flex", alignItems: "center", borderBottom: i < arr.length - 1 ? "1px solid #ECECEC" : "none", background: "#FFFFFF" }}>
+                        <div style={{ flex: 1, padding: "12px 20px" }}><span style={{ fontSize: 14, color: "#545453" }}>{label}</span></div>
+                        <div style={{ padding: "12px 20px", textAlign: "right" }}><span style={{ fontSize: 14, fontWeight: 500, color: "#080908" }}>{value}</span></div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* VAT Return boxes — sections with full-row gray headers */}
                   <div style={{ border: "1px solid #ECECEC", borderRadius: 6, overflow: "hidden" }}>
                     {[
-                      { box: 1, label: "VAT due on sales and other outputs",                                                                                                                              value: "£3,211.44", highlight: false },
-                      { box: 2, label: "VAT due on intra-community acquisitions of goods made in Northern Ireland from EU Member States",                                                                 value: "£0.00",     highlight: false },
-                      { box: 3, label: "Total VAT due (the sum of boxes 1 and 2)",                                                                                                                       value: "£3,211.44", highlight: false },
-                      { box: 4, label: "VAT reclaimed on purchases and other inputs (including acquisitions from the EU)",                                                                                value: vatFmt(vatBox4), highlight: false },
-                      { box: 5, label: "Net VAT to be paid to Customs or reclaimed by you (difference between boxes 3 and 4)",                                                                           value: vatFmt(vatBox5), highlight: true  },
-                      { box: 6, label: "Total value of sales and all other outputs excluding any VAT",                                                                                                    value: "£16,057",   highlight: false },
-                      { box: 7, label: "Total value of purchases and all other inputs excluding any VAT",                                                                                                 value: "£5,488",    highlight: false },
-                      { box: 8, label: "Total value of intra-community dispatches of goods and related costs, excluding any VAT, from Northern Ireland to EU Member States",                              value: "£0",        highlight: false },
-                      { box: 9, label: "Total value of intra-community acquisitions of goods and related costs, excluding any VAT, made in Northern Ireland from EU Member States",                       value: "£0",        highlight: false },
-                    ].map(({ box, label, value, highlight }, i, arr) => (
-                      <div key={box} style={{ display: "flex", alignItems: "stretch", borderBottom: i < arr.length - 1 ? "1px solid #ECECEC" : "none", background: highlight ? "#F0FBF0" : "#FFFFFF" }}>
-                        <div style={{ flex: 1, padding: "16px 20px", display: "flex", alignItems: "center" }}>
-                          <p style={{ fontSize: 14, color: highlight ? "#084D08" : "#545453", margin: 0, lineHeight: "20px" }}>{label}</p>
+                      { section: "VAT Calculations", rows: [
+                        { box: 1, label: "VAT due in the period on sales and other outputs",                                                               value: "£3,211.44", highlight: false },
+                        { box: 2, label: "VAT due in the period on acquisitions of goods made in Northern Ireland from EU Member States",                   value: "£0.00",     highlight: false },
+                        { box: 3, label: "Total VAT due (the sum of boxes 1 and 2)",                                                                       value: "£3,211.44", highlight: false },
+                        { box: 4, label: "VAT reclaimed in the period on purchases and other inputs (including acquisitions from the EU)",                  value: vatFmt(vatBox4), highlight: false },
+                        { box: 5, label: "VAT to Pay HMRC",                                                                                                value: vatFmt(vatBox5), highlight: true, bold: true },
+                      ]},
+                      { section: "Sales and Purchases Excluding VAT", rows: [
+                        { box: 6, label: "Total value of sales and all other outputs excluding any VAT",                                                    value: "£16,057",   highlight: false },
+                        { box: 7, label: "Total value of purchases and all other inputs excluding any VAT",                                                 value: "£5,488",    highlight: false },
+                      ]},
+                      { section: "EC Supplies and Purchases Excluding VAT", rows: [
+                        { box: 8, label: "Total value of all supplies of goods and related costs, excluding any VAT, to EU member states",                  value: "£0",        highlight: false },
+                        { box: 9, label: "Total value of all acquisitions of goods and related costs, excluding any VAT, from EU member states",            value: "£0",        highlight: false },
+                      ]},
+                    ].map(({ section, rows }, si, arr) => (
+                      <React.Fragment key={section}>
+                        {/* Section header row */}
+                        <div style={{ display: "flex", alignItems: "center", padding: "10px 20px", background: "#F5F5F5", borderBottom: "1px solid #ECECEC" }}>
+                          <span style={{ fontSize: 13, fontWeight: 600, color: "#080908" }}>{section}</span>
                         </div>
-                        <div style={{ display: "flex", alignItems: "center", borderLeft: "1px solid #ECECEC", flexShrink: 0 }}>
-                          <div style={{ width: 40, display: "flex", alignItems: "center", justifyContent: "center", background: "#05A105", alignSelf: "stretch" }}>
-                            <span style={{ fontSize: 13, fontWeight: 700, color: "#FFFFFF" }}>{box}</span>
+                        {/* Data rows */}
+                        {rows.map(({ box, label, value, highlight, bold }, i) => (
+                          <div key={box} style={{ display: "flex", alignItems: "stretch", borderBottom: (si < arr.length - 1 || i < rows.length - 1) ? "1px solid #ECECEC" : "none", background: highlight ? "#F0FBF0" : "#FFFFFF" }}>
+                            <div style={{ flex: 1, padding: "14px 20px", display: "flex", alignItems: "center" }}>
+                              <p style={{ fontSize: 14, fontWeight: bold ? 700 : 400, color: highlight ? "#084D08" : "#545453", margin: 0, lineHeight: "20px" }}>{label}</p>
+                            </div>
+                            <div style={{ display: "flex", alignItems: "center", borderLeft: "1px solid #ECECEC", flexShrink: 0 }}>
+                              <div style={{ width: 40, display: "flex", alignItems: "center", justifyContent: "center", background: "#ECECEC", alignSelf: "stretch" }}>
+                                <span style={{ fontSize: 11, fontWeight: 600, color: "#545453" }}>{box}</span>
+                              </div>
+                              <div style={{ minWidth: 120, padding: "14px 20px", textAlign: "right" }}>
+                                <span style={{ fontSize: 14, fontWeight: bold ? 700 : 500, color: highlight ? "#084D08" : "#080908" }}>{value}</span>
+                              </div>
+                            </div>
                           </div>
-                          <div style={{ width: 140, padding: "16px 20px", textAlign: "right" }}>
-                            <span style={{ fontSize: 14, fontWeight: 500, color: highlight ? "#084D08" : "#080908" }}>{value}</span>
-                          </div>
-                        </div>
-                      </div>
+                        ))}
+                      </React.Fragment>
                     ))}
                   </div>
                 </div>
@@ -12906,57 +12961,27 @@ function VATReviewFlow({ onClose, selectedPeriod = "April 2026", resolvedCards, 
                     <input type="text" value={tableSearch} onChange={e => setTableSearch(e.target.value)} placeholder="Search..." style={{ flex: 1, border: "none", outline: "none", background: "transparent", fontSize: 16, color: "#080908", fontFamily: "'Inter', sans-serif" }} />
                   </div>
                   <div style={{ display: "flex", alignItems: "center", padding: "12px 16px", gap: 8 }}>
-                    <button style={{ display: "inline-flex", alignItems: "center", gap: 6, height: 40, padding: "0 14px", border: "1px solid #E9E9EB", borderRadius: 8, background: "#FFFFFF", cursor: "pointer", fontSize: 14, fontWeight: 500, color: "#080908", fontFamily: "'Inter', sans-serif" }}
-                      onMouseEnter={e => e.currentTarget.style.background = "#F5F5F5"}
-                      onMouseLeave={e => e.currentTarget.style.background = "#FFFFFF"}>
-                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.5v11M1.5 7h11" stroke="#080908" strokeWidth="1.5" strokeLinecap="round"/></svg>
-                      Add filter
-                    </button>
-                    <div style={{ position: "relative" }}>
-                      {(() => {
-                        const sel = [...statusFilterSet];
-                        const pill = (label) => (<span style={{ background: "#EBEBEB", borderRadius: 5, padding: "2px 7px", fontSize: 13, fontWeight: 500, color: "#080908", maxWidth: 110, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", display: "inline-block" }}>{label}</span>);
-                        const plusPill = (n) => (<span style={{ background: "#EBEBEB", borderRadius: 5, padding: "2px 7px", fontSize: 13, fontWeight: 500, color: "#080908", flexShrink: 0 }}>+{n}</span>);
+                    {(() => {
+                      const counts = { Priority: 0, Review: 0, Clear: 0 };
+                      VAT_ACCOUNT_TX.forEach((s, si) => s.rows.forEach((row, ri) => {
+                        const eff = (resolvedRowKeys.has(`${si}-${ri}`) || (row.cardIdx != null && (resolvedCards.has(row.cardIdx) || ignoredCards.has(row.cardIdx)))) ? "Clear" : row.status;
+                        if (counts[eff] != null) counts[eff] += 1;
+                      }));
+                      const labelMap = {"Priority": "VAT Prioritized", "Review": "VAT Review", "Clear": "Clear"};
+                      const labelMap = {"Priority": "VAT Prioritized", "Review": "VAT Review", "Clear": "Clear"};
+                      return ["Priority", "Review", "Clear"].map(opt => {
+                        const isActive = statusFilterSet.has(opt);
+                        const palette = VAT_STATUS_PALETTE[opt];
                         return (
-                      <button ref={statusFilterBtnRef} onClick={() => setStatusFilterOpen(o => !o)}
-                        style={{ display: "inline-flex", alignItems: "center", gap: 6, height: 40, padding: "0 10px 0 12px", border: "1px solid #E9E9EB", borderRadius: 8, background: statusFilterOpen ? "#F5F5F5" : "#FFFFFF", cursor: "pointer", fontSize: 14, fontWeight: 500, color: "#080908", fontFamily: "'Inter', sans-serif" }}
-                        onMouseEnter={e => { if (!statusFilterOpen) e.currentTarget.style.background = "#F5F5F5"; }}
-                        onMouseLeave={e => { if (!statusFilterOpen) e.currentTarget.style.background = "#FFFFFF"; }}>
-                        <span>Status</span>
-                        {sel.length > 0 && pill(sel[0])}
-                        {sel.length > 1 && plusPill(sel.length - 1)}
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ transition: "transform 0.2s", transform: statusFilterOpen ? "rotate(180deg)" : "rotate(0deg)" }}><path d="M4 6L8 10L12 6" stroke="#080908" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                      </button>
+                          <button key={opt}
+                            onClick={() => { const next = new Set(statusFilterSet); isActive ? next.delete(opt) : next.add(opt); setStatusFilterSet(next); }}
+                            style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 40, padding: "0 12px", border: `1px solid ${isActive ? "#05A105" : "#E9E9EB"}`, borderRadius: 8, background: isActive ? "#05A105" : "#FFFFFF", cursor: "pointer", fontSize: 14, fontWeight: 500, color: isActive ? "#FFFFFF" : "#080908", fontFamily: "'Inter', sans-serif", flexShrink: 0 }}>
+                            {labelMap[opt] || opt}
+                            <span style={{ fontSize: 12, fontWeight: 500, padding: "2px 7px", borderRadius: 4, background: isActive ? "#E8F5E8" : palette.background, color: isActive ? "#05A105" : palette.color }}>{counts[opt]}</span>
+                          </button>
                         );
-                      })()}
-                      {statusFilterOpen && (
-                        <div ref={statusFilterDropRef} style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, background: "#FFFFFF", border: "1px solid #E9E9EB", borderRadius: 12, boxShadow: "0 8px 24px rgba(0,0,0,0.10)", zIndex: 999, minWidth: 220, padding: 6, fontFamily: "'Inter', sans-serif" }}>
-                          {(() => {
-                            const counts = { Priority: 0, Review: 0, Clear: 0 };
-                            VAT_ACCOUNT_TX.forEach((s, si) => s.rows.forEach((row, ri) => {
-                              const eff = (resolvedRowKeys.has(`${si}-${ri}`) || (row.cardIdx != null && (resolvedCards.has(row.cardIdx) || ignoredCards.has(row.cardIdx)))) ? "Clear" : row.status;
-                              if (counts[eff] != null) counts[eff] += 1;
-                            }));
-                            return ["Priority", "Review", "Clear"].map(opt => {
-                              const isChecked = statusFilterSet.has(opt);
-                              const palette = VAT_STATUS_PALETTE[opt];
-                              return (
-                                <div key={opt} onClick={() => { const next = new Set(statusFilterSet); isChecked ? next.delete(opt) : next.add(opt); setStatusFilterSet(next); }}
-                                  style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", cursor: "pointer", borderRadius: 6 }}
-                                  onMouseEnter={e => e.currentTarget.style.background = "#F5F5F5"}
-                                  onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                                  <div style={{ width: 18, height: 18, borderRadius: 5, border: `1.5px solid ${isChecked ? "#05A105" : "#CFCFD1"}`, background: isChecked ? "#05A105" : "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                                    {isChecked && <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M10 3L4.5 8.5L2 6" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-                                  </div>
-                                  <span style={{ fontSize: 14, color: "#080908", flex: 1 }}>{opt}</span>
-                                  <span style={{ fontSize: 12, fontWeight: 500, padding: "2px 8px", borderRadius: 4, background: palette.background, color: palette.color, whiteSpace: "nowrap", flexShrink: 0 }}>{counts[opt]}</span>
-                                </div>
-                              );
-                            });
-                          })()}
-                        </div>
-                      )}
-                    </div>
+                      });
+                    })()}
                     <div style={{ position: "relative" }}>
                       {(() => {
                         const sel = [...accountFilterSet];
@@ -13260,7 +13285,7 @@ function VATReviewFlow({ onClose, selectedPeriod = "April 2026", resolvedCards, 
 
         {/* Suggestions sidebar */}
         {canvasReady && (
-          <div style={{ position: "absolute", top: 16, bottom: 16, right: 16, width: 600, zIndex: 3, display: "flex", flexDirection: "column", gap: 12, fontFamily: "'Inter', sans-serif", transform: (resultsVisible && boxesOpen) ? "translateX(0)" : "translateX(calc(100% + 32px))", transition: "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)", pointerEvents: (resultsVisible && boxesOpen) ? "auto" : "none", overflowY: "auto" }}>
+          <div style={{ position: "absolute", top: 16, bottom: 16, right: 16, width: 600, zIndex: 3, display: "flex", flexDirection: "column", gap: 32, fontFamily: "'Inter', sans-serif", transform: (resultsVisible && boxesOpen) ? "translateX(0)" : "translateX(calc(100% + 32px))", transition: "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)", pointerEvents: (resultsVisible && boxesOpen) ? "auto" : "none", overflowY: "auto" }}>
 
             {/* Suggestions progress widget */}
             <div style={{ flexShrink: 0, background: "#FFFFFF", borderRadius: 8, border: "1px solid #ECECEC", margin: "0 8px", fontFamily: "'Inter', sans-serif" }}>
@@ -13286,8 +13311,7 @@ function VATReviewFlow({ onClose, selectedPeriod = "April 2026", resolvedCards, 
             <div style={{ display: "flex", flexDirection: "column", gap: 16, padding: "0 8px" }}>
               {groupedCards.map((group, gi) => (
                 <div key={group.key}>
-                  <h3 style={{ fontSize: 13, fontWeight: 500, color: "#8C8C8B", textTransform: "uppercase", letterSpacing: "0.5px", margin: "24px 0 8px" }}>{VAT_CAT_LABELS[group.key] || group.key}</h3>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
                     {group.items.map((card, localIdx) => {
                       const isResolved = resolvedCards.has(card.idx);
                       const isIgnored  = ignoredCards.has(card.idx);
@@ -13327,6 +13351,8 @@ function VATReviewFlow({ onClose, selectedPeriod = "April 2026", resolvedCards, 
                                 openVatPreview({ contact: card.contact, amount: card.tableRow["Amount"], date: card.tableRow["Date"], account: card.tableRow["Expense account"], type: "Invoice", status: "Review", fileName: card.contact + " invoice.pdf", bankMatch: false, isDuplicate: false, cardIdx: card.idx, cardTitle: card.title, vatFrom: card.tableRow["VAT rate name"], vatTo: card.tableRow["Suggested"], description: card.description });
                               }
                             }}
+                            tertiaryLabel={card.tertiaryLabel || null}
+                            onTertiaryAction={() => {}}
                             onMore={() => {}}
                           />
                         </div>
@@ -13421,6 +13447,1450 @@ function VATReviewFlow({ onClose, selectedPeriod = "April 2026", resolvedCards, 
     </div>
   );
 }
+
+// ── VAT Review Flow V2 (independent copy for separate modifications) ─
+function VATReviewFlowV2({ onClose, selectedPeriod = "April 2026", resolvedCards, setResolvedCards, ignoredCards, setIgnoredCards, showResults = false }) {
+  const [stepStatuses, setStepStatuses] = useState(showResults ? VAT_STEPS.map(() => "done") : []);
+  const [stepSubtexts, setStepSubtexts] = useState(showResults ? VAT_STEPS.map(() => true) : []);
+  const [visibleSteps, setVisibleSteps] = useState(showResults ? VAT_STEPS.length : 0);
+  const [stepsPopulated, setStepsPopulated] = useState(showResults);
+  const [stepsCollapsed, setStepsCollapsed] = useState(showResults);
+  const [resultsVisible, setResultsVisible]   = useState(showResults);
+  const [canvasReady, setCanvasReady]         = useState(showResults);
+  const [boxesOpen, setBoxesOpen]             = useState(false);
+  const [showVATReport, setShowVATReport]     = useState(false);
+  const [periodDropOpen, setPeriodDropOpen]   = useState(false);
+  const [activePeriod, setActivePeriod]       = useState(selectedPeriod);
+  const [auditTrailOpen, setAuditTrailOpen]   = useState(false);
+  const auditTrailOpenRef = useRef(false);
+  useEffect(() => { auditTrailOpenRef.current = auditTrailOpen; }, [auditTrailOpen]);
+  const [selectedRow, setSelectedRow] = useState(null); // { key, cardIdx }
+  const selectedCardIdx = selectedRow ? selectedRow.cardIdx : null;
+  const [statusFilterSet, setStatusFilterSet] = useState(new Set());
+  const [statusFilterOpen, setStatusFilterOpen] = useState(false);
+  const statusFilterBtnRef = useRef(null);
+  const statusFilterDropRef = useRef(null);
+  useEffect(() => {
+    if (!statusFilterOpen) return;
+    const onClick = (e) => {
+      if (statusFilterDropRef.current && !statusFilterDropRef.current.contains(e.target) &&
+          statusFilterBtnRef.current && !statusFilterBtnRef.current.contains(e.target)) {
+        setStatusFilterOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, [statusFilterOpen]);
+  const ALL_ACCOUNT_NAMES = ["Accounts Payable","Accruals","Advertising & Marketing","Audit & Accountancy fees","Bank Fees","Cleaning","Consulting","Cost of Goods Sold","Depreciation Expense","Direct Expenses","Direct Wages","General Expenses","IT Software and Consumables","Legal Expenses","Light, Power, Heating","Pensions Costs","Postage, Freight & Courier","Prepayments","Printing & Stationery","Repairs & Maintenance","Salaries","Staff Training","Subscriptions","Tracking Transfers","Travel - National","VAT"];
+  const [accountFilterSet, setAccountFilterSet] = useState(new Set());
+  const [accountFilterOpen, setAccountFilterOpen] = useState(false);
+  const [accountFilterSearch, setAccountFilterSearch] = useState("");
+  const [suggestionsBoxCollapsed, setSuggestionsBoxCollapsed] = useState(false);
+  const [resolvedRowKeys, setResolvedRowKeys] = useState(new Set());
+  const accountFilterBtnRef = useRef(null);
+  const accountFilterDropRef = useRef(null);
+  useEffect(() => {
+    if (!accountFilterOpen) return;
+    const onClick = (e) => {
+      if (accountFilterDropRef.current && !accountFilterDropRef.current.contains(e.target) &&
+          accountFilterBtnRef.current && !accountFilterBtnRef.current.contains(e.target)) {
+        setAccountFilterOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, [accountFilterOpen]);
+  const [chatPanelOpen, setChatPanelOpen] = useState(!showResults);
+  const [tableSearch, setTableSearch] = useState("");
+  const [txRightShadow, setTxRightShadow] = useState(false);
+  const txScrollRef = useRef(null);
+  const txHeaderRef = useRef(null);
+  const [txSortKey, setTxSortKey] = useState(null);
+  const [txSortDir, setTxSortDir] = useState("asc");
+  useEffect(() => {
+    if (!selectedRow) return;
+    const onDown = (e) => { if (!e.target.closest) return; if (!e.target.closest('[data-tx-row]') && !e.target.closest('[data-rec-card]')) setSelectedRow(null); };
+    const onKey = (e) => { if (e.key === "Escape") setSelectedRow(null); };
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => { document.removeEventListener("mousedown", onDown); document.removeEventListener("keydown", onKey); };
+  }, [selectedRow]);
+  useEffect(() => {
+    if (!canvasReady) return;
+    const update = () => {
+      const el = txScrollRef.current;
+      if (!el) return;
+      setTxRightShadow(el.scrollWidth - el.clientWidth - el.scrollLeft > 1);
+    };
+    update();
+    const t = setTimeout(update, 400);
+    window.addEventListener("resize", update);
+    return () => { clearTimeout(t); window.removeEventListener("resize", update); };
+  }, [canvasReady]);
+  const periodDropRef = useRef(null);
+  const ALL_PERIODS = ["January 2026","February 2026","March 2026","April 2026","May 2026","June 2026","July 2026","August 2026","September 2026","October 2026","November 2026","December 2026"];
+  const [vatReportLoading, setVatReportLoading] = useState(false);
+  const [chatWidth, setChatWidth]             = useState(400);
+  const [isDragging, setIsDragging]           = useState(false);
+  const [sidebarWidth, setSidebarWidth]     = useState(null);   // null = use CSS 50%, number = px
+  const [isDraggingSidebar, setIsDraggingSidebar] = useState(false);
+  const containerRef = useRef(null);
+  useEffect(() => {
+    if (!isDraggingSidebar) return;
+    const onMove = (e) => {
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const newW = Math.max(280, Math.min(rect.width - (chatPanelOpen ? chatWidth + 64 : 48) - 280, rect.right - e.clientX - 16));
+      setSidebarWidth(newW);
+    };
+    const onUp = () => setIsDraggingSidebar(false);
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseup", onUp);
+    return () => { document.removeEventListener("mousemove", onMove); document.removeEventListener("mouseup", onUp); };
+  }, [isDraggingSidebar, chatPanelOpen, chatWidth]);
+  const [isAtBottom, setIsAtBottom]           = useState(true);
+  const [inputValue, setInputValue]           = useState("");
+  const [toast, setToast]                     = useState(null);
+  const [vatPreviewRow, setVatPreviewRow]     = useState(null);
+  const [vatPreviewVisible, setVatPreviewVisible] = useState(false);
+  const vatPreviewOpenRef = useRef(false);
+  const openVatPreview = (row) => { vatPreviewOpenRef.current = true; setVatPreviewRow(row); setVatPreviewVisible(false); requestAnimationFrame(() => requestAnimationFrame(() => setVatPreviewVisible(true))); };
+  const closeVatPreview = () => { vatPreviewOpenRef.current = false; setVatPreviewVisible(false); setTimeout(() => setVatPreviewRow(null), 360); };
+  const [vatAuditEntries, setVatAuditEntries] = useState([]);
+  const vatAuditCounterRef = useRef(0);
+  const addVatAuditEntry = (action, details, color = "#05A105") => {
+    const now = new Date();
+    const time = now.getHours().toString().padStart(2,"0") + ":" + now.getMinutes().toString().padStart(2,"0");
+    const id = ++vatAuditCounterRef.current;
+    setVatAuditEntries(prev => [{ id, time, color, action, actor: "Laura Bennett", details }, ...prev]);
+  };
+  const chatScrollRef = useRef(null);
+  const chatEndRef    = useRef(null);
+  const stepRowRefs   = useRef([]);
+
+  useEffect(() => {
+    const handler = (e) => { if (e.key === "Escape") { if (vatPreviewOpenRef.current || auditTrailOpenRef.current) { return; } else { onClose?.(); } } };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, []);
+
+  const [analysisOpen, setAnalysisOpen] = useState(false);
+  const [rerunKey, setRerunKey] = useState(0);
+  const [vatAnswers, setVatAnswers] = useState(showResults ? VAT_QUESTIONS.map(() => "yes") : []);
+  const allVatAnswered = vatAnswers.length >= VAT_QUESTIONS.length;
+  // revealedCount controls when the next question's content appears (after a thinking delay)
+  const PATTERN_THEMES_TEXT = "Pattern themes: Seabrook Foods Ltd.\nPeriod: 2026-05-01 – 2026-05-30\nThemes: 96 (from 222 individual patterns)";
+  const [revealedCount, setRevealedCount] = useState(showResults ? VAT_QUESTIONS.length : 0);
+  const isThinking = !showResults && rerunKey === 0 && vatAnswers.length > 0 && vatAnswers.length >= revealedCount && !allVatAnswered;
+
+  // Subsequent reveals — after user answers, thinking delay, then next question
+  useEffect(() => {
+    if (showResults || rerunKey !== 0 || vatAnswers.length === 0 || vatAnswers.length < revealedCount) return;
+    const t = setTimeout(() => setRevealedCount(c => Math.min(c + 1, VAT_QUESTIONS.length)), 1600);
+    return () => clearTimeout(t);
+  }, [vatAnswers.length, revealedCount]);
+
+  // One typewriter hook per question — card appears exactly when each text finishes
+  const { done: q0TextDone } = useTypewriter(revealedCount >= 1 ? VAT_QUESTIONS[0].identified : "", 18, showResults);
+  const { done: q1TextDone } = useTypewriter(revealedCount >= 2 ? VAT_QUESTIONS[1].identified : "", 18, showResults);
+  const { done: q2TextDone } = useTypewriter(revealedCount >= 3 ? VAT_QUESTIONS[2].identified : "", 18, showResults);
+  const { done: q3TextDone } = useTypewriter(revealedCount >= 4 ? VAT_QUESTIONS[3].identified : "", 18, showResults);
+  const { done: q4TextDone } = useTypewriter(revealedCount >= 5 ? VAT_QUESTIONS[4].identified : "", 18, showResults);
+  const qTextDones = [q0TextDone, q1TextDone, q2TextDone, q3TextDone, q4TextDone];
+  const currentQTextDone = revealedCount > 0 && revealedCount <= VAT_QUESTIONS.length ? qTextDones[revealedCount - 1] : false;
+
+  const [highlightedVatOption, setHighlightedVatOption] = useState(0);
+  const stepsComplete = stepStatuses.length > 0 && stepStatuses.every(s => s === "done");
+  const totalSuggestions = VAT_CARDS.length;
+
+  // Typewriter messages — defined before effects so introDone is in scope
+  const introSegments = rerunKey === 0 ? [
+    { text: "Great, let's do a ", bold: false },
+    { text: "VAT and miscoding review.", bold: true },
+    { text: " Let me run through some things, then we can look at the results together.", bold: false },
+  ] : [
+    { text: "Sure, let's re-run the ", bold: false },
+    { text: "VAT and miscoding review.", bold: true },
+    { text: " Let me run through some things, then we can look at the results together.", bold: false },
+  ];
+  const introFull = introSegments.map(s => s.text).join("");
+  const { done: introDone } = useTypewriter(introFull, 18, showResults);
+
+  // Track exactly when pattern themes text finishes typing
+  const { done: patternThemesDone } = useTypewriter(
+    introDone && rerunKey === 0 ? PATTERN_THEMES_TEXT : "", 18, showResults
+  );
+
+  // cardVisible and keyboard nav — placed here so introDone is in scope
+  const cardVisible = rerunKey === 0 && introDone && !allVatAnswered && !isThinking && !showResults && currentQTextDone;
+  const highlightedVatRef = useRef(0);
+  useEffect(() => {
+    if (!cardVisible) return;
+    setHighlightedVatOption(0);
+    highlightedVatRef.current = 0;
+    const handler = (e) => {
+      const opts = (VAT_QUESTIONS[vatAnswers.length] && VAT_QUESTIONS[vatAnswers.length].options) || [{ key: "yes" }, { key: "no" }];
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        const next = Math.min(highlightedVatRef.current + 1, opts.length - 1);
+        highlightedVatRef.current = next;
+        setHighlightedVatOption(next);
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        const next = Math.max(highlightedVatRef.current - 1, 0);
+        highlightedVatRef.current = next;
+        setHighlightedVatOption(next);
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        setVatAnswers(prev => [...prev, opts[highlightedVatRef.current].key]);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [cardVisible]);
+
+  // Initial reveal of Q0 — triggered the moment intro finishes typing
+  useEffect(() => {
+    if (!introDone || showResults || rerunKey !== 0 || revealedCount > 0) return;
+    setRevealedCount(1);
+  }, [introDone, revealedCount]);
+
+  // Phase 1: reveal steps one by one once theme question answered (or on re-run)
+  useEffect(() => {
+    if (rerunKey === 0 ? (!allVatAnswered || (showResults && rerunKey === 0)) : !introDone) return;
+    const REVEAL_INTERVAL = 600;
+    const timers = [];
+    VAT_STEPS.forEach((_, i) => {
+      timers.push(setTimeout(() => {
+        setVisibleSteps(i + 1);
+      }, i * REVEAL_INTERVAL));
+    });
+    const totalRevealTime = (VAT_STEPS.length - 1) * REVEAL_INTERVAL + 450;
+    timers.push(setTimeout(() => setStepsPopulated(true), totalRevealTime));
+    return () => timers.forEach(clearTimeout);
+  }, [introDone, rerunKey, allVatAnswered]);
+
+  // Phase 2: run spinner through steps once all are populated
+  useEffect(() => {
+    if (!stepsPopulated || (showResults && rerunKey === 0)) return;
+    setStepStatuses(VAT_STEPS.map((_, i) => i === 0 ? "active" : "pending"));
+    setStepSubtexts(VAT_STEPS.map(() => false));
+    let cumulative = 0;
+    const timers = [];
+    VAT_STEPS.forEach((step, i) => {
+      cumulative += step.duration;
+      if (step.subtext) {
+        timers.push(setTimeout(() => {
+          setStepSubtexts(prev => { const next = [...prev]; next[i] = true; return next; });
+        }, cumulative - 400));
+      }
+      timers.push(setTimeout(() => {
+        setStepStatuses(prev => {
+          const next = [...prev];
+          next[i] = "done";
+          if (i + 1 < VAT_STEPS.length) next[i + 1] = "active";
+          return next;
+        });
+      }, cumulative));
+    });
+    return () => timers.forEach(clearTimeout);
+  }, [stepsPopulated]);
+
+  // Collapse steps when chat slides into sidebar
+  useEffect(() => {
+    if (!resultsVisible) return;
+    const t = setTimeout(() => setStepsCollapsed(true), 360);
+    return () => clearTimeout(t);
+  }, [resultsVisible]);
+
+  // Show canvas once steps finish
+  useEffect(() => {
+    if (stepsComplete) setResultsVisible(true);
+  }, [stepsComplete]);
+
+  // When canvas lands: collapse chat so canvas is full width
+  useEffect(() => {
+    if (resultsVisible && !showResults) setChatPanelOpen(false);
+  }, [resultsVisible, showResults]);
+
+  // Canvas content ready after slide-in animation
+  useEffect(() => {
+    if (!resultsVisible) return;
+    if (showResults && rerunKey === 0) { setCanvasReady(true); return; }
+    const t1 = setTimeout(() => setCanvasReady(true), 3200);
+    return () => { clearTimeout(t1); };
+  }, [resultsVisible]);
+
+  // Open suggestions sidebar once canvas spinner is done
+  useEffect(() => {
+    // V2: sidebar collapsed by default, no auto-open
+  }, [canvasReady, showResults]);
+
+  // Spin keyframe
+  useEffect(() => {
+    if (document.getElementById("_spin_kf")) return;
+    const s = document.createElement("style");
+    s.id = "_spin_kf";
+    s.textContent = "@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } } @keyframes stepPop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } } @keyframes vatOverlayFlash { 0%{opacity:0} 25%{opacity:1} 75%{opacity:1} 100%{opacity:0} }";
+    document.head.appendChild(s);
+  }, []);
+
+  // Auto-scroll to bottom
+  useEffect(() => {
+    if (chatScrollRef.current) {
+      chatScrollRef.current.scrollTo({ top: chatScrollRef.current.scrollHeight, behavior: "smooth" });
+    }
+  }, [stepStatuses, stepsCollapsed, resultsVisible, visibleSteps, cardVisible, revealedCount, vatAnswers.length, isThinking]);
+
+  // Track whether chat is scrolled to bottom
+  useEffect(() => {
+    const el = chatScrollRef.current;
+    if (!el) return;
+    const onScroll = () => setIsAtBottom(el.scrollHeight - el.scrollTop - el.clientHeight < 40);
+    el.addEventListener("scroll", onScroll);
+    return () => el.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Close period dropdown on outside click
+  useEffect(() => {
+    if (!periodDropOpen) return;
+    const handler = (e) => { if (periodDropRef.current && !periodDropRef.current.contains(e.target)) setPeriodDropOpen(false); };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [periodDropOpen]);
+
+  // Drag handle
+  const handleDragStart = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+    const startX = e.clientX;
+    const startWidth = chatWidth;
+    const onMouseMove = (e) => setChatWidth(Math.max(280, Math.min(700, startWidth + (e.clientX - startX))));
+    const onMouseUp = () => {
+      setIsDragging(false);
+      document.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mouseup", onMouseUp);
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+    };
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
+  };
+
+  const handleRerun = () => {
+    setResultsVisible(false);
+    setStepStatuses([]);
+    setStepSubtexts([]);
+    setVisibleSteps(0);
+    setStepsPopulated(false);
+    setStepsCollapsed(false);
+    setInputValue("");
+    setBoxesOpen(false);
+    setShowVATReport(false);
+    setTimeout(() => setCanvasReady(false), 720);
+    // Trigger phase 1 to restart after canvas slides out
+    setTimeout(() => setRerunKey(k => k + 1), 400);
+  };
+
+  // Dynamic VAT values based on resolved suggestions
+  const VAT_CARD_ADJ = { 0: 210.00, 1: 480.00, 2: 90.00, 3: -340.00, 4: 125.00 };
+  const vatBox1 = 3211.44;
+  const vatBox4Base = 1097.56;
+  let vatBox4Adj = 0;
+  resolvedCards.forEach(idx => { vatBox4Adj += VAT_CARD_ADJ[idx] || 0; });
+  const vatBox4 = vatBox4Base + vatBox4Adj;
+  const vatBox5 = vatBox1 - vatBox4;
+  const vatFmt = (n) => `£${Math.abs(n).toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+  const catOrder = ["uncertain", "wrong-code", "reverse-charge", "non-reclaimable", "pva"];
+  const groupedCards = catOrder.reduce((acc, key) => {
+    const items = VAT_CARDS.filter(c => c.cat === key);
+    if (items.length) acc.push({ key, items });
+    return acc;
+  }, []);
+
+  const resolvedCount = resolvedCards.size + ignoredCards.size;
+  const pct = totalSuggestions > 0 ? Math.min(100, Math.round((resolvedCount / totalSuggestions) * 100)) : 0;
+  const allDone = resolvedCount >= totalSuggestions;
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", height: "100vh", fontFamily: "'Inter', sans-serif", background: "#FBFBFB" }}>
+      <style>{`
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+        @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes resultsFadeIn { from{opacity:0} to{opacity:1} }
+        @keyframes textShimmer { 0%{background-position:200% center} 100%{background-position:-200% center} }
+        @keyframes toastIn { from{opacity:0;transform:translateX(-50%) translateY(-12px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+        @keyframes stepPop { 0%{transform:scale(0.8);opacity:0} 100%{transform:scale(1);opacity:1} }
+        @keyframes stepReveal { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes slideUpFade { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes thinkingShimmer { 0%{background-position:200% center} 100%{background-position:-200% center} }
+        .vat-mimo-loader { width:auto; height:20px; overflow:visible; }
+        .vat-mimo-loader path { fill:#1F2024; transform-box:fill-box; transform-origin:center; }
+        .vat-mimo-loader .m-right, .vat-mimo-loader .m-left { animation:mimo-counter-a 2.2s infinite; }
+        .vat-mimo-loader .m-diag { animation:mimo-counter-b 2.2s infinite; }
+        @keyframes mimo-counter-a { 0%{transform:rotate(0deg);animation-timing-function:linear} 10%{transform:rotate(0deg);animation-timing-function:cubic-bezier(.65,0,.35,1)} 45%{transform:rotate(360deg);animation-timing-function:linear} 55%{transform:rotate(360deg);animation-timing-function:cubic-bezier(.65,0,.35,1)} 90%,100%{transform:rotate(0deg)} }
+        @keyframes mimo-counter-b { 0%{transform:rotate(0deg);animation-timing-function:linear} 10%{transform:rotate(0deg);animation-timing-function:cubic-bezier(.65,0,.35,1)} 45%{transform:rotate(-360deg);animation-timing-function:linear} 55%{transform:rotate(-360deg);animation-timing-function:cubic-bezier(.65,0,.35,1)} 90%,100%{transform:rotate(0deg)} }
+      `}</style>
+
+      {/* Top bar — matches bank reconciliation style */}
+      <div style={{ height: 96, background: "#FFFFFF", borderBottom: "1px solid #ECECEC", display: "flex", alignItems: "center", padding: "0 24px", flexShrink: 0, gap: 16, zIndex: 10, position: "relative" }}>
+        <span style={{ fontSize: 24, fontWeight: 500, color: "#080908", flexShrink: 0, letterSpacing: "-1px" }}>VAT and miscoding review</span>
+
+        {/* Chat toggle button — show/hide left chat panel */}
+        {canvasReady && (
+          <Tooltip text={chatPanelOpen ? "Hide chat" : "Show chat"} placement="bottom">
+          <button
+            onClick={() => setChatPanelOpen(o => !o)}
+            style={{ display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontFamily: "inherit", border: "1px solid #E9E9EB", borderRadius: 8, background: "#FFFFFF", height: 48, width: 48, flexShrink: 0, transition: "background 0.15s" }}
+            onMouseEnter={e => e.currentTarget.style.background = "#F7F7F7"}
+            onMouseLeave={e => e.currentTarget.style.background = "#FFFFFF"}
+          >
+            {chatPanelOpen ? (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
+                <path d="M3 3v18M21 12H7M7 12L14 5M7 12L14 19" stroke="#1F2024" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            ) : (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
+                <path d="M9 3v18M7.8 3h8.4c1.68 0 2.52 0 3.162.327a3 3 0 0 1 1.311 1.311C21 5.28 21 6.12 21 7.8v8.4c0 1.68 0 2.52-.327 3.162a3 3 0 0 1-1.311 1.311c-.642.327-1.482.327-3.162.327H7.8c-1.68 0-2.52 0-3.162-.327a3 3 0 0 1-1.311-1.311C3 18.72 3 17.88 3 16.2V7.8c0-1.68 0-2.52.327-3.162a3 3 0 0 1 1.311-1.311C5.28 3 6.12 3 7.8 3Z" stroke="#1F2024" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            )}
+          </button>
+          </Tooltip>
+        )}
+
+        {/* Period dropdown */}
+        <div ref={periodDropRef} style={{ position: "relative" }}>
+          <button
+            onClick={() => setPeriodDropOpen(o => !o)}
+            style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "0 12px", height: 48, border: "1px solid #E9E9EB", borderRadius: 8, background: "#FFFFFF", cursor: "pointer", fontSize: 14, fontWeight: 500, color: "#080908", fontFamily: "'Inter', sans-serif", whiteSpace: "nowrap" }}
+          >
+            <span>{activePeriod}</span>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ transition: "transform 0.2s ease", transform: periodDropOpen ? "rotate(180deg)" : "rotate(0deg)", flexShrink: 0 }}>
+              <path d="M4 6L8 10L12 6" stroke="#080908" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+          {periodDropOpen && (
+            <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, background: "#FFFFFF", border: "1px solid #E9E9EB", borderRadius: 12, boxShadow: "0 8px 24px rgba(0,0,0,0.08)", zIndex: 100, minWidth: 260, overflow: "hidden", padding: "6px" }}>
+              {ALL_PERIODS.map((p, idx) => {
+                const isSelected = p === activePeriod;
+                const isCompleted = idx < 3;
+                const isInReview = p === "April 2026";
+                const isNotStarted = idx > 3;
+                return (
+                  <button key={p} onClick={() => { setActivePeriod(p); setPeriodDropOpen(false); }}
+                    style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, textAlign: "left", padding: "10px 12px", fontSize: 14, color: "#080908", fontWeight: isSelected ? 500 : 400, background: isSelected ? "#F5F5F5" : "transparent", border: "none", cursor: "pointer", borderRadius: 8, boxSizing: "border-box", fontFamily: "'Inter', sans-serif" }}
+                    onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = "#FAFAFA"; }}
+                    onMouseLeave={e => { if (!isSelected) e.currentTarget.style.background = "transparent"; }}
+                  >
+                    <span>{p}</span>
+                    {isCompleted && (
+                      <span style={{ fontSize: 12, fontWeight: 500, color: "#05A105", background: "#F1F8F0", padding: "2px 8px", borderRadius: 20, whiteSpace: "nowrap", flexShrink: 0 }}>
+                        Completed
+                      </span>
+                    )}
+                    {isInReview && (
+                      <span style={{ fontSize: 12, fontWeight: 500, color: "#D5A750", background: "#FDF8EE", padding: "2px 8px", borderRadius: 20, whiteSpace: "nowrap", flexShrink: 0 }}>
+                        In review
+                      </span>
+                    )}
+                    {isNotStarted && (
+                      <span style={{ fontSize: 12, fontWeight: 500, color: "#8C8C8B", background: "#F5F5F5", padding: "2px 8px", borderRadius: 20, whiteSpace: "nowrap", flexShrink: 0 }}>
+                        Not started
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Audit trail button */}
+        {canvasReady && <button
+          onClick={() => setAuditTrailOpen(true)}
+          style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "0 14px", height: 48, border: "1px solid #E9E9EB", borderRadius: 8, background: "#FFFFFF", cursor: "pointer", fontSize: 14, fontWeight: 500, color: "#080908", fontFamily: "'Inter', sans-serif", whiteSpace: "nowrap" }}
+          onMouseEnter={e => { e.currentTarget.style.background = "#F5F5F5"; e.currentTarget.style.borderColor = "#CFCFD1"; }}
+          onMouseLeave={e => { e.currentTarget.style.background = "#FFFFFF"; e.currentTarget.style.borderColor = "#E9E9EB"; }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 12L9 12M21 6L9 6M21 18L9 18M5 12C5 12.5523 4.55228 13 4 13C3.44772 13 3 12.5523 3 12C3 11.4477 3.44772 11 4 11C4.55228 11 5 11.4477 5 12ZM5 6C5 6.55228 4.55228 7 4 7C3.44772 7 3 6.55228 3 6C3 5.44772 3.44772 5 4 5C4.55228 5 5 5.44772 5 6ZM5 18C5 18.5523 4.55228 19 4 19C3.44772 19 3 18.5523 3 18C3 17.4477 3.44772 17 4 17C4.55228 17 5 17.4477 5 18Z" stroke="#1F2024" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          Audit log
+        </button>}
+
+        <div style={{ flex: 1 }} />
+
+        {/* Suggestions toggle — same expanding button as bank rec */}
+        {resultsVisible && canvasReady && (
+          <Tooltip text={boxesOpen ? "Collapse sidebar" : "Expand sidebar"} placement="bottom">
+          <button
+            onClick={() => setBoxesOpen(o => !o)}
+            style={{ display: "flex", alignItems: "center", gap: 0, marginRight: 8, cursor: "pointer", fontFamily: "inherit", border: "1px solid #E9E9EB", borderRadius: 8, background: "#FFFFFF", height: 48, minWidth: 48, padding: boxesOpen ? 0 : "0 12px 0 0", overflow: "hidden", justifyContent: "center", flexShrink: 0, transition: "padding 0.35s cubic-bezier(0.16,1,0.3,1), background 0.15s" }}
+            onMouseEnter={e => e.currentTarget.style.background = "#F7F7F7"}
+            onMouseLeave={e => e.currentTarget.style.background = "#FFFFFF"}
+          >
+            <div style={{ maxWidth: boxesOpen ? 0 : 260, opacity: boxesOpen ? 0 : 1, overflow: "hidden", transition: "max-width 0.35s cubic-bezier(0.16,1,0.3,1), opacity 0.2s, padding 0.35s cubic-bezier(0.16,1,0.3,1)", display: "flex", alignItems: "center", paddingLeft: boxesOpen ? 0 : 12, paddingRight: boxesOpen ? 0 : 10 }}>
+              <span style={{ fontSize: 14, fontWeight: 500, color: "#545453", whiteSpace: "nowrap" }}>View account transactions</span>
+            </div>
+            {boxesOpen ? (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
+                <path d="M21 21V3M3 12H17M17 12L10 5M17 12L10 19" stroke="#1F2024" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            ) : (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
+                <path d="M15 21L15 3M16.2 21H7.8C6.11984 21 5.27976 21 4.63803 20.673C4.07354 20.3854 3.6146 19.9265 3.32698 19.362C3 18.7202 3 17.8802 3 16.2V7.8C3 6.11984 3 5.27976 3.32698 4.63803C3.6146 4.07354 4.07354 3.6146 4.63803 3.32698C5.27976 3 6.11984 3 7.8 3H16.2C17.8802 3 18.7202 3 19.362 3.32698C19.9265 3.6146 20.3854 4.07354 20.673 4.63803C21 5.27976 21 6.11984 21 7.8V16.2C21 17.8802 21 18.7202 20.673 19.362C20.3854 19.9265 19.9265 20.3854 19.362 20.673C18.7202 21 17.8802 21 16.2 21Z" stroke="#1F2024" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            )}
+          </button>
+          </Tooltip>
+        )}
+
+        {/* Close X button — same circle style as bank rec */}
+        <button onClick={onClose}
+          style={{ border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", width: 30, height: 30, borderRadius: "50%", flexShrink: 0, padding: 0 }}
+        >
+          <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+            <rect width="30" height="30" rx="15" fill="#F5F5F5"/>
+            <path d="M20 10L10 20M10 10L20 20" stroke="#2A2A2A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+      {/* Content area — identical structure to ReconciliationFlow */}
+      <div style={{ display: "flex", flex: 1, overflow: "hidden", position: "relative", padding: 16 }}>
+
+        {/* Left chat panel — full width until canvas appears, then transitions to sidebar */}
+        <div style={{ display: chatPanelOpen ? "flex" : "none", flexDirection: "column", width: resultsVisible ? chatWidth : "100%", flexShrink: 0, transition: isDragging ? "none" : "width 0.72s cubic-bezier(0.16, 1, 0.3, 1)", overflow: "hidden", willChange: "width", position: "relative", zIndex: 1 }}>
+
+          {/* Scroll-to-bottom button */}
+          {resultsVisible && (
+            <button
+              onClick={() => chatScrollRef.current?.scrollTo({ top: chatScrollRef.current.scrollHeight, behavior: "smooth" })}
+              style={{ position: "absolute", bottom: 218, left: "50%", transform: "translateX(-50%)", zIndex: 10, width: 32, height: 32, borderRadius: "50%", background: "#FFFFFF", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 12px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.06)", opacity: isAtBottom ? 0 : 1, pointerEvents: isAtBottom ? "none" : "auto", transition: "opacity 0.35s ease" }}
+              onMouseEnter={e => e.currentTarget.style.background = "#F5F5F5"}
+              onMouseLeave={e => e.currentTarget.style.background = "#FFFFFF"}
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M12 5V19M12 19L19 12M12 19L5 12" stroke="#1F2024" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+          )}
+
+          {/* Chat scroll area */}
+          <div style={{ flex: 1, overflow: "hidden", position: "relative", display: "flex", flexDirection: "column" }}>
+            <div ref={chatScrollRef} style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", scrollBehavior: "smooth" }}>
+              {resultsVisible && <div style={{ position: "sticky", top: 0, height: 40, marginBottom: -40, background: "linear-gradient(to bottom, rgba(251,251,251,1) 0%, rgba(251,251,251,0) 100%)", zIndex: 2, pointerEvents: "none", flexShrink: 0 }} />}
+              <div style={{ maxWidth: 680, width: "100%", margin: "0 auto", padding: resultsVisible ? "24px 24px 72px" : cardVisible ? "24px 24px 24px" : "24px 24px 300px", flex: 1, display: "flex", flexDirection: "column" }}>
+
+                {/* Workflow card */}
+                <WorkflowCard label={`VAT and miscoding review for ${selectedPeriod}`} />
+                <p style={{ fontSize: 14, color: "#8C8C8B", margin: "0 0 8px 0" }}>Running workflow</p>
+
+                {/* Intro AI message */}
+                <div style={{ fontSize: 14, color: "#080908", lineHeight: "22px", width: resultsVisible ? "90%" : "70%" }}>
+                  <p style={{ margin: 0 }}><StreamingMessage segments={introSegments} speed={18} instant={showResults} /></p>
+                </div>
+                {/* Writing spinner while intro is typing */}
+                {rerunKey === 0 && !introDone && !showResults && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 16, marginTop: 20 }}>
+                    <svg className="vat-mimo-loader" viewBox="0 0 22 20" xmlns="http://www.w3.org/2000/svg" aria-label="Writing">
+                      <path className="m-right" d="M21.2948 0.314453H16.2686V19.8217H21.2948V0.314453Z"/>
+                      <path className="m-diag"  d="M3.55406 0L0 3.55406L10.9144 14.4685L14.4685 10.9144L3.55406 0Z"/>
+                      <path className="m-left"  d="M5.56185 10.7432H0.535645V19.8207H5.56185V10.7432Z"/>
+                    </svg>
+                    <span style={{ fontSize: 14, display: "inline-block", background: "linear-gradient(90deg, #8C8C8B 0%, #8C8C8B 25%, #D4D4D4 50%, #8C8C8B 75%, #8C8C8B 100%)", backgroundSize: "200% auto", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", animation: "thinkingShimmer 2.4s linear infinite" }}>Writing...</span>
+                  </div>
+                )}
+
+                {/* Sequential Q&A — each question revealed after previous is answered + thinking delay */}
+                {rerunKey === 0 && introDone && VAT_QUESTIONS.map((q, i) => {
+                  if (revealedCount <= i) return null;
+                  return (
+                    <React.Fragment key={i}>
+                      <div style={{ marginTop: 20, width: resultsVisible ? "90%" : "70%", fontSize: 14, color: "#080908", lineHeight: "22px" }}>
+                        <p style={{ margin: 0 }}><StreamingMessage key={`vat-q-${i}`} segments={vatBoldSegments(q.identified)} speed={18} instant={showResults} /></p>
+                      </div>
+                      {/* Writing spinner — shown while this question's identified text is still typing */}
+                      {i === revealedCount - 1 && !qTextDones[i] && !showResults && (
+                        <div style={{ display: "flex", alignItems: "center", gap: 16, marginTop: 20, animation: "slideUpFade 0.4s cubic-bezier(0.16,1,0.3,1) both" }}>
+                          <svg className="vat-mimo-loader" viewBox="0 0 22 20" xmlns="http://www.w3.org/2000/svg" aria-label="Writing">
+                            <path className="m-right" d="M21.2948 0.314453H16.2686V19.8217H21.2948V0.314453Z"/>
+                            <path className="m-diag"  d="M3.55406 0L0 3.55406L10.9144 14.4685L14.4685 10.9144L3.55406 0Z"/>
+                            <path className="m-left"  d="M5.56185 10.7432H0.535645V19.8207H5.56185V10.7432Z"/>
+                          </svg>
+                          <span style={{ fontSize: 14, display: "inline-block", background: "linear-gradient(90deg, #8C8C8B 0%, #8C8C8B 25%, #D4D4D4 50%, #8C8C8B 75%, #8C8C8B 100%)", backgroundSize: "200% auto", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", animation: "thinkingShimmer 2.4s linear infinite" }}>Writing...</span>
+                        </div>
+                      )}
+                      {vatAnswers[i] && !showResults && (
+                        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20, animation: "slideUpFade 0.4s cubic-bezier(0.16,1,0.3,1) both" }}>
+                          <div style={{ maxWidth: 400, background: "#F1F8F0", borderRadius: "12px 12px 2px 12px", padding: "10px 14px", fontSize: 14, color: "#080908", lineHeight: "22px" }}>
+                            {((VAT_QUESTIONS[i].options || [{ key: "yes", label: "Yes" }, { key: "no", label: "No" }]).find(o => o.key === vatAnswers[i]) || {}).label || vatAnswers[i]}
+                          </div>
+                        </div>
+                      )}
+                      {/* Thinking spinner — shown after this answer, while waiting for next reveal */}
+                      {vatAnswers[i] && i === vatAnswers.length - 1 && isThinking && (
+                        <div style={{ display: "flex", alignItems: "center", gap: 16, marginTop: 20, animation: "slideUpFade 0.4s cubic-bezier(0.16,1,0.3,1) both" }}>
+                          <svg className="vat-mimo-loader" viewBox="0 0 22 20" xmlns="http://www.w3.org/2000/svg" aria-label="Thinking">
+                            <path className="m-right" d="M21.2948 0.314453H16.2686V19.8217H21.2948V0.314453Z"/>
+                            <path className="m-diag"  d="M3.55406 0L0 3.55406L10.9144 14.4685L14.4685 10.9144L3.55406 0Z"/>
+                            <path className="m-left"  d="M5.56185 10.7432H0.535645V19.8207H5.56185V10.7432Z"/>
+                          </svg>
+                          <span style={{ fontSize: 14, display: "inline-block", background: "linear-gradient(90deg, #8C8C8B 0%, #8C8C8B 25%, #D4D4D4 50%, #8C8C8B 75%, #8C8C8B 100%)", backgroundSize: "200% auto", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", animation: "thinkingShimmer 2.4s linear infinite" }}>Thinking...</span>
+                        </div>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+
+                {/* Steps block */}
+                {visibleSteps > 0 && (
+                  <div style={{ marginTop: 24 }}>
+                    <div onClick={() => setStepsCollapsed(c => !c)} style={{ display: "flex", alignItems: "flex-start", gap: 12, marginBottom: stepsCollapsed ? 0 : 20, cursor: "pointer" }}>
+                      <div style={{ width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                          <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m-6 9 2 2 4-4" stroke="#8C8C8B" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                          <span style={{ fontSize: 15, fontWeight: 600, color: "#080908" }}>VAT and miscoding review</span>
+                          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ transition: "transform 0.2s ease", transform: stepsCollapsed ? "rotate(180deg)" : "rotate(0deg)" }}>
+                            <path d="M3 8.5L7 4.5L11 8.5" stroke="#8C8C8B" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        </div>
+                        <span style={{ fontSize: 13, color: "#8C8C8B" }}>{stepsPopulated && stepsComplete ? "Completed" : "In progress"}</span>
+                      </div>
+                    </div>
+
+                    <div style={{ overflow: "hidden", maxHeight: stepsCollapsed ? 0 : 800, opacity: stepsCollapsed ? 0 : 1, transition: "max-height 0.45s cubic-bezier(0.16,1,0.3,1), opacity 0.35s ease" }}>
+                      {VAT_STEPS.map((step, i) => {
+                        if (i >= visibleSteps) return null;
+                        const status = stepsPopulated ? (stepStatuses[i] || "pending") : "pending";
+                        const isLast = i === VAT_STEPS.length - 1;
+                        return (
+                          <div key={i} ref={el => stepRowRefs.current[i] = el} style={{ display: "flex", gap: 16, animation: "stepReveal 0.4s cubic-bezier(0.16,1,0.3,1) both" }}>
+                            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0, paddingTop: 2, overflow: "visible" }}>
+                              <div style={{ width: 20, height: 20, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", overflow: "visible" }}>
+                                {status === "done" && (
+                                  <svg key={`done-${i}`} width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ animation: "stepPop 0.35s cubic-bezier(0.34,1.4,0.64,1) both", overflow: "visible" }}>
+                                    <circle cx="10" cy="10" r="10" fill="#05A105"/>
+                                    <path d="M5.5 10.5L8.5 13.5L14.5 7" stroke="#FFFFFF" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
+                                  </svg>
+                                )}
+                                {status === "active" && (
+                                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ animation: "spin 0.75s linear infinite" }}>
+                                    <path d="M10 2A8 8 0 1 1 2 10" stroke="#05A105" strokeWidth="1.5" strokeLinecap="round"/>
+                                  </svg>
+                                )}
+                                {status === "pending" && (
+                                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                    <circle cx="10" cy="10" r="9.25" stroke="#E9E9EB" strokeWidth="1.5"/>
+                                  </svg>
+                                )}
+                              </div>
+                              {!isLast && i + 1 < visibleSteps && <div style={{ width: 1, flexGrow: 1, minHeight: 20, background: "#E9E9EB", margin: "4px 0" }} />}
+                            </div>
+                            <div style={{ paddingBottom: isLast ? 0 : 20 }}>
+                              <div style={{ fontSize: 14, lineHeight: "24px", fontWeight: status === "pending" ? 400 : 500, color: status === "pending" ? "#8C8C8B" : "#000000", transition: "color 0.3s ease, font-weight 0.3s ease" }}>{step.title}</div>
+                              {(stepSubtexts[i] || status === "done") && step.subtext && (
+                                <div style={{ fontSize: 13, color: "#8C8C8B", marginTop: 2, lineHeight: "18px", animation: "fadeIn 0.3s ease" }}>{step.subtext}</div>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                <div ref={chatEndRef} />
+              </div>
+            </div>
+          </div>
+
+          {/* Reviewer question card — pinned at bottom, cycles through all VAT_QUESTIONS */}
+          {cardVisible && (
+            <div style={{ padding: "28px 24px 24px", flexShrink: 0 }}>
+              <div style={{ maxWidth: 680, margin: "0 auto" }}>
+                <div style={{ background: "#FFFFFF", border: "1px solid #E9E9EB", borderRadius: 8, padding: "24px 24px 16px", width: "100%", boxShadow: "0 12px 24px 0 rgba(0,0,0,0.04)" }}>
+                  <p style={{ fontSize: 14, fontWeight: 500, color: "#080908", marginBottom: 16, marginTop: 0 }}>{vatBoldJSX(VAT_QUESTIONS[vatAnswers.length].question)}</p>
+                  {(VAT_QUESTIONS[vatAnswers.length].options || [{ key: "yes", label: "Yes" }, { key: "no", label: "No" }]).map((opt, i) => {
+                    const isActive = i === highlightedVatOption;
+                    return (
+                      <div
+                        key={opt.key}
+                        onClick={() => setVatAnswers(prev => [...prev, opt.key])}
+                        onMouseEnter={() => { highlightedVatRef.current = i; setHighlightedVatOption(i); }}
+                        style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", padding: "14px 18px", marginBottom: 8, background: isActive ? "#E3E3E3" : "#F7F7F7", border: "none", borderRadius: 10, cursor: "pointer", fontSize: 14, fontWeight: isActive ? 600 : 400, color: "#080908", boxSizing: "border-box", transition: "background 0.1s" }}
+                      >
+                        <span>{opt.label}</span>
+                        {isActive && (
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0, marginLeft: 8, opacity: 0.45 }}>
+                            <path d="M3.69714 14.804L7.69604 18.8029C7.758 18.8653 7.83171 18.9149 7.91293 18.9487C7.99415 18.9826 8.08126 19 8.16924 19C8.25723 19 8.34434 18.9826 8.42556 18.9487C8.50677 18.9149 8.58049 18.8653 8.64245 18.8029C8.70491 18.7409 8.7545 18.6672 8.78833 18.586C8.82217 18.5047 8.83959 18.4176 8.83959 18.3297C8.83959 18.2417 8.82217 18.1546 8.78833 18.0733C8.7545 17.9921 8.70491 17.9184 8.64245 17.8565L5.77657 14.9972H17.5C18.3838 14.9972 19.2314 14.6461 19.8564 14.0212C20.4813 13.3962 20.8324 12.5486 20.8324 11.6648V5.66648C20.8324 5.48972 20.7622 5.3202 20.6372 5.19521C20.5122 5.07022 20.3427 5 20.1659 5C19.9892 5 19.8196 5.07022 19.6947 5.19521C19.5697 5.3202 19.4994 5.48972 19.4994 5.66648V11.6648C19.4994 12.1951 19.2888 12.7037 18.9138 13.0786C18.5389 13.4536 18.0303 13.6643 17.5 13.6643H5.77657L8.64245 10.8051C8.76795 10.6796 8.83845 10.5093 8.83845 10.3319C8.83845 10.1544 8.76795 9.98416 8.64245 9.85866C8.51694 9.73316 8.34673 9.66265 8.16924 9.66265C7.99176 9.66265 7.82154 9.73316 7.69604 9.85866L3.69714 13.8576C3.63468 13.9195 3.58509 13.9932 3.55126 14.0744C3.51742 14.1557 3.5 14.2428 3.5 14.3308C3.5 14.4187 3.51742 14.5059 3.55126 14.5871C3.58509 14.6683 3.63468 14.742 3.69714 14.804Z" fill="black"/>
+                          </svg>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 10 }}>
+                  <span style={{ fontSize: 12, color: "#8C8C8B" }}>↑↓ to navigate</span>
+                  <span style={{ fontSize: 12, color: "#CFCFD1" }}>·</span>
+                  <span style={{ fontSize: 12, color: "#8C8C8B" }}>Enter to select</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Typing indicator — shown while steps are running, after all questions answered */}
+          {!stepsComplete && allVatAnswered && (
+            <div style={{ padding: "0 24px 20px", flexShrink: 0 }}>
+              <div style={{ maxWidth: 680, margin: "0 auto" }}>
+                <div style={{ borderRadius: 8, padding: "14px 14px 12px", background: "#FFFFFF", boxShadow: "0 12px 24px 0 rgba(0,0,0,0.04), 0 0 0 1px #E9E9EB" }}>
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <div style={{ fontSize: 14, lineHeight: "22px", flex: 1 }}>
+                      <span style={{ background: "linear-gradient(90deg, #9D9D9E 0%, #9D9D9E 30%, #2A2A2A 50%, #9D9D9E 70%, #9D9D9E 100%)", backgroundSize: "200% auto", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", animation: "textShimmer 2s linear infinite", display: "inline-block" }}>
+                        Analysing transactions...
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Chat input — shown once results are visible */}
+          {resultsVisible && (
+            <div style={{ padding: "60px 12px 16px", flexShrink: 0, background: "linear-gradient(to bottom, rgba(251,251,251,0) 0%, rgba(251,251,251,1) 60px)", marginTop: -60 }}>
+              <div style={{ maxWidth: 680, margin: "0 auto" }}>
+                {/* Re-run button */}
+                <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+                  <button
+                    onClick={handleRerun}
+                    style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, height: 40, padding: "0 16px", border: "1px solid #E9E9EB", borderRadius: 8, background: "#FFFFFF", cursor: "pointer", boxShadow: "0 12px 24px 0 rgba(0,0,0,0.04)", fontSize: 14, fontWeight: 500, color: "#080908" }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "#FAFAFA"; e.currentTarget.style.borderColor = "#CFCFD1"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "#FFFFFF"; e.currentTarget.style.borderColor = "#E9E9EB"; }}
+                  >
+                    <PlayCircleIcon color="#080908" size={18} />
+                    Re-run
+                  </button>
+                </div>
+                <div style={{ borderRadius: 8, padding: "14px 14px 12px", background: "#FFFFFF", boxShadow: "0 12px 24px 0 rgba(0,0,0,0.04), 0 0 0 1px #E9E9EB" }}>
+                  <textarea
+                    value={inputValue}
+                    onChange={e => setInputValue(e.target.value)}
+                    placeholder="Ask for changes or information..."
+                    rows={3}
+                    style={{ width: "100%", border: "none", outline: "none", resize: "none", fontSize: 14, color: "#080908", lineHeight: "22px", background: "transparent", fontFamily: "'Inter', sans-serif", display: "block" }}
+                  />
+                  <div style={{ display: "flex", alignItems: "center", marginTop: 8 }}>
+                    <button style={{ width: 32, height: 32, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6, color: "#8C8C8B", padding: 0 }}
+                      onMouseEnter={e => e.currentTarget.style.background = "#F5F5F5"}
+                      onMouseLeave={e => e.currentTarget.style.background = "none"}>
+                      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                        <path d="M15.5 8.5L8.5 15.5C7.12 16.88 4.88 16.88 3.5 15.5C2.12 14.12 2.12 11.88 3.5 10.5L10.5 3.5C11.33 2.67 12.67 2.67 13.5 3.5C14.33 4.33 14.33 5.67 13.5 6.5L6.5 13.5C6.08 13.92 5.42 13.92 5 13.5C4.58 13.08 4.58 12.42 5 12L11.5 5.5" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </button>
+                    <div style={{ flex: 1 }} />
+                    <button style={{ width: 36, height: 36, marginLeft: 6, border: "1px solid #E9E9EB", borderRadius: 10, background: inputValue.trim() ? "#05A105" : "#FAFAFA", cursor: inputValue.trim() ? "pointer" : "default", display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.15s", padding: 0 }}>
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M9.99984 15.8346V4.16797M9.99984 4.16797L4.1665 10.0013M9.99984 4.16797L15.8332 10.0013" stroke={inputValue.trim() ? "#FFFFFF" : "#8C8C8B"} strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Drag handle */}
+        {resultsVisible && (
+          <div onMouseDown={handleDragStart} style={{ position: "absolute", top: 0, bottom: 0, left: chatWidth + 16, width: 16, cursor: "col-resize", zIndex: 5, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ width: 4, height: 40, borderRadius: 2, background: isDragging ? "#CFCFD1" : "transparent", transition: "background 0.15s" }} />
+          </div>
+        )}
+
+        {/* Canvas — slides in from right, absolutely positioned */}
+        <div style={{ position: "absolute", top: 16, bottom: 16, left: chatPanelOpen ? chatWidth + 32 : 16, right: resultsVisible && boxesOpen ? (sidebarWidth !== null ? sidebarWidth + 24 : (chatPanelOpen ? `calc(50% - ${Math.round(chatWidth / 2)}px)` : "calc(50% + 8px)")) : 16, background: "#FFFFFF", borderRadius: 8, border: "1px solid #ECECEC", overflow: "hidden", zIndex: 2, transform: resultsVisible ? "none" : "translateX(calc(100% + 32px))", transition: isDragging ? "none" : "transform 0.72s cubic-bezier(0.16, 1, 0.3, 1), right 0.35s cubic-bezier(0.16, 1, 0.3, 1), left 0.35s cubic-bezier(0.16, 1, 0.3, 1)", willChange: resultsVisible ? "auto" : "transform" }}>
+          {canvasReady ? (
+            <div style={{ height: "100%", overflowY: "auto", paddingTop: 24, paddingBottom: 24, paddingLeft: "max(24px, calc(50% - 399px))", paddingRight: "max(24px, calc(50% - 399px))" }}>
+
+              {/* Results heading */}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+                <h2 style={{ fontSize: 22, fontWeight: 600, color: "#080908", margin: 0 }}>Results</h2>
+                <SecondaryButton style={{ height: 36, padding: "0 14px", fontSize: 14, borderRadius: 8 }}>
+                  Re-sync
+                </SecondaryButton>
+              </div>
+
+              {/* Analysis & key findings */}
+              <div style={{ background: "#FFFFFF", border: "1px solid #E9E9EB", borderRadius: 8, marginBottom: 20, overflow: "hidden" }}>
+                <button onClick={() => setAnalysisOpen(o => !o)} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "13px 16px", border: "none", background: "none", cursor: "pointer" }}>
+                  <span style={{ fontSize: 14, fontWeight: 500, color: "#080908" }}>Analysis & key findings</span>
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ transform: analysisOpen ? "rotate(0deg)" : "rotate(180deg)", transition: "transform 0.2s", flexShrink: 0 }}><path d="M4 6L8 10L12 6" stroke="#080908" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </button>
+                {analysisOpen && (
+                  <div style={{ padding: "14px 16px 16px", fontSize: 14, color: "#4F4F4F", lineHeight: "22px", borderTop: "1px solid #EFF1F4" }}>
+                    The VAT review identified {totalSuggestions} items requiring attention across {groupedCards.length} categories. {resolvedCount} of {totalSuggestions} suggestions have been resolved. Review remaining items before filing.
+                  </div>
+                )}
+              </div>
+
+              {/* VAT summary table */}
+              <DataTable
+                columns={[
+                  { key: "label", label: "Description", width: "1fr" },
+                  { key: "value", label: "Value", width: "200px", align: "right" },
+                ]}
+                rows={[
+                  { label: "Opening balance",   value: "£43,731.85" },
+                  { label: "Closing balance",   value: "£46,845.73" },
+                  { label: "Net VAT due",       value: "£2,113.88" },
+                  { label: "Filing deadline",   value: "7 Aug 2026" },
+                  { label: "Suggestions found", value: String(totalSuggestions) },
+                ]}
+                containerStyle={{ marginBottom: 28 }}
+              />
+
+              {/* Suggestions summary table */}
+              {(() => {
+                const catDefs = [
+                  { label: "Uncertain VAT",       key: "uncertain" },
+                  { label: "Wrong VAT code",      key: "wrong-code" },
+                  { label: "Reverse charge",      key: "reverse-charge" },
+                  { label: "Non-reclaimable VAT", key: "non-reclaimable" },
+                  { label: "Postponed VAT (PVA)", key: "pva" },
+                ];
+                const rows = catDefs.map(c => ({ label: c.label, count: String((groupedCards.find(g => g.key === c.key) || { items: [] }).items.length) })).filter(r => r.count !== "0");
+                const total = rows.reduce((s, r) => s + parseInt(r.count), 0);
+                return (
+                  <DataTable
+                    columns={[
+                      { key: "label", label: "Suggestion description", width: "1fr" },
+                      { key: "count", label: "Suggestions found", width: "180px", align: "right" },
+                    ]}
+                    rows={rows}
+                    footerRow={{ label: "Total", count: String(total) }}
+                    containerStyle={{ marginBottom: 28 }}
+                  />
+                );
+              })()}
+
+              {/* Review items heading */}
+              {/* Review items heading */}
+              <div style={{ borderTop: "1px solid #E9E9EB", margin: "0 0 24px" }} />
+              <h3 style={{ fontSize: 22, fontWeight: 500, color: "#080908", margin: "0 0 16px" }}>Suggestions</h3>
+            <div style={{ display: "flex", flexDirection: "column", gap: 16, padding: "0" }}>
+              {groupedCards.map((group, gi) => (
+                <div key={group.key}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
+                    {group.items.map((card, localIdx) => {
+                      const isResolved = resolvedCards.has(card.idx);
+                      const isIgnored  = ignoredCards.has(card.idx);
+                      return (
+                        <div key={card.idx} id={`result-${card.cat}-${localIdx}`} data-rec-card={selectedCardIdx === card.idx ? "1" : undefined} style={{ scrollMarginTop: 64 }}>
+                          <RecommendationCard
+                            highlighted={selectedCardIdx === card.idx}
+                            title={card.title}
+                            score={card.score ?? null}
+                            description={card.description}
+                            verticalTable={true}
+                            hideMore={true}
+                            statusLabel={isResolved ? "Resolved" : isIgnored ? "Ignored" : "Unresolved"}
+                            statusStyle={isResolved ? { background: "#F1F8F0", border: "none", color: "#05A105" } : isIgnored ? { background: "#F5F5F5", border: "none", color: "#8C8C8B" } : { background: "#FDF8EE", border: "none", color: "#D5A750" }}
+                            collapsed={isResolved || isIgnored}
+                            isIgnored={isIgnored}
+                            tableRow={card.tableRow}
+                            primaryLabel={card.primaryLabel}
+                            secondaryLabel={card.secondaryLabel}
+                            onPrimaryAction={() => {
+                              if (card.primaryLabel === "Review") {
+                                openVatPreview({ contact: card.contact, amount: card.tableRow["Amount"], date: card.tableRow["Date"], account: card.tableRow["Expense account"], type: "Invoice", status: "Review", fileName: card.contact + " invoice.pdf", bankMatch: false, isDuplicate: false, cardIdx: card.idx, cardTitle: card.title, vatFrom: card.tableRow["VAT rate name"], vatTo: card.tableRow["Suggested"], description: card.description });
+                              } else {
+                                if (selectedRow && selectedRow.cardIdx === card.idx) {
+                                  setResolvedRowKeys(prev => new Set([...prev, selectedRow.key]));
+                                } else {
+                                  setResolvedCards(prev => new Set([...prev, card.idx]));
+                                }
+                                setSelectedRow(prev => prev && prev.cardIdx === card.idx ? null : prev);
+                                addVatAuditEntry("VAT suggestion resolved", `${card.title} – ${card.contact}, ${card.tableRow["Amount"]}, ${card.tableRow["Date"]}. Marked as resolved.`, "#05A105");
+                                setToast("Action recorded"); setTimeout(() => setToast(null), 3000);
+                              }
+                            }}
+                            onIgnore={() => { if (selectedRow && selectedRow.cardIdx === card.idx) { setResolvedRowKeys(prev => new Set([...prev, selectedRow.key])); } else { setIgnoredCards(prev => new Set([...prev, card.idx])); } setSelectedRow(prev => prev && prev.cardIdx === card.idx ? null : prev); addVatAuditEntry("VAT suggestion ignored", `${card.title} – ${card.contact}, ${card.tableRow["Amount"]}, ${card.tableRow["Date"]}. Suggestion ignored.`, "#8C8C8B"); setToast("Suggestion ignored"); setTimeout(() => setToast(null), 3000); }}
+                            onSecondaryAction={() => {
+                              if (card.secondaryLabel === "Review") {
+                                openVatPreview({ contact: card.contact, amount: card.tableRow["Amount"], date: card.tableRow["Date"], account: card.tableRow["Expense account"], type: "Invoice", status: "Review", fileName: card.contact + " invoice.pdf", bankMatch: false, isDuplicate: false, cardIdx: card.idx, cardTitle: card.title, vatFrom: card.tableRow["VAT rate name"], vatTo: card.tableRow["Suggested"], description: card.description });
+                              }
+                            }}
+                             tertiaryLabel={card.tertiaryLabel || null}
+                             onTertiaryAction={() => {}}
+                            onMore={() => {}}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          ) : resultsVisible ? <CanvasLoader /> : null}
+        </div>
+
+        {/* Account transactions sidebar */}
+        {canvasReady && (
+          <div style={{ position: "absolute", top: 16, bottom: 16, right: 16, left: sidebarWidth !== null ? undefined : (chatPanelOpen ? `calc(50% + ${Math.round(chatWidth / 2) + 16}px)` : "calc(50% + 8px)"), width: sidebarWidth !== null ? sidebarWidth : undefined, zIndex: 3, background: "#FFFFFF", borderRadius: 8, border: "1px solid #ECECEC", overflow: "hidden", transform: (resultsVisible && boxesOpen) ? "translateX(0)" : "translateX(calc(100% + 32px))", transition: "left 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)", pointerEvents: (resultsVisible && boxesOpen) ? "auto" : "none" }}>
+            <div style={{ animation: "resultsFadeIn 0.4s ease 0.1s both", height: "100%", overflowY: "auto" }}>
+              {showVATReport ? (
+                /* ── Full VAT return table ── */
+                vatReportLoading ? (
+                  <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14 }}>
+                    <svg width="36" height="36" viewBox="0 0 36 36" fill="none" style={{ animation: "spin 0.75s linear infinite", flexShrink: 0 }}>
+                      <path d="M18 3A15 15 0 1 1 3 18" stroke="#05A105" strokeWidth="2.5" strokeLinecap="round"/>
+                    </svg>
+                    <p style={{ fontSize: 14, color: "#8C8C8B", margin: 0 }}>Preparing VAT return report…</p>
+                  </div>
+                ) : (
+                <div style={{ padding: "48px 48px", maxWidth: 860, margin: "0 auto", animation: "resultsFadeIn 0.4s ease both" }}>
+                  {/* Back button */}
+                  <button onClick={() => setShowVATReport(false)}
+                    style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 40, padding: "0 14px", border: "1px solid #E9E9EB", borderRadius: 8, background: "#FFFFFF", cursor: "pointer", fontSize: 14, fontWeight: 500, color: "#080908", fontFamily: "'Inter', sans-serif", marginBottom: 32 }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "#F5F5F5"; e.currentTarget.style.borderColor = "#CFCFD1"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "#FFFFFF"; e.currentTarget.style.borderColor = "#E9E9EB"; }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="#1F2024" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    Back to results
+                  </button>
+                  {/* Header */}
+                  <div style={{ marginBottom: 32, marginTop: 8 }}>
+                    <p style={{ fontSize: 14, fontWeight: 500, color: "#000000", margin: "0 0 6px" }}>Seabrook Foods Ltd</p>
+                    <h1 style={{ fontSize: 28, fontWeight: 700, color: "#000000", margin: "0 0 8px", letterSpacing: "-0.5px" }}>VAT Return</h1>
+                    <p style={{ fontSize: 14, color: "#8C8C8B", margin: 0 }}>01 Apr 2026 — 30 Apr 2026</p>
+                  </div>
+                  {/* 9 boxes */}
+                  <div style={{ border: "1px solid #ECECEC", borderRadius: 6, overflow: "hidden" }}>
+                    {[
+                      { box: 1, label: "VAT due on sales and other outputs",                                                                                                                              value: "£3,211.44", highlight: false },
+                      { box: 2, label: "VAT due on intra-community acquisitions of goods made in Northern Ireland from EU Member States",                                                                 value: "£0.00",     highlight: false },
+                      { box: 3, label: "Total VAT due (the sum of boxes 1 and 2)",                                                                                                                       value: "£3,211.44", highlight: false },
+                      { box: 4, label: "VAT reclaimed on purchases and other inputs (including acquisitions from the EU)",                                                                                value: vatFmt(vatBox4), highlight: false },
+                      { box: 5, label: "Net VAT to be paid to Customs or reclaimed by you (difference between boxes 3 and 4)",                                                                           value: vatFmt(vatBox5), highlight: true  },
+                      { box: 6, label: "Total value of sales and all other outputs excluding any VAT",                                                                                                    value: "£16,057",   highlight: false },
+                      { box: 7, label: "Total value of purchases and all other inputs excluding any VAT",                                                                                                 value: "£5,488",    highlight: false },
+                      { box: 8, label: "Total value of intra-community dispatches of goods and related costs, excluding any VAT, from Northern Ireland to EU Member States",                              value: "£0",        highlight: false },
+                      { box: 9, label: "Total value of intra-community acquisitions of goods and related costs, excluding any VAT, made in Northern Ireland from EU Member States",                       value: "£0",        highlight: false },
+                    ].map(({ box, label, value, highlight }, i, arr) => (
+                      <div key={box} style={{ display: "flex", alignItems: "stretch", borderBottom: i < arr.length - 1 ? "1px solid #ECECEC" : "none", background: highlight ? "#F0FBF0" : "#FFFFFF" }}>
+                        <div style={{ flex: 1, padding: "16px 20px", display: "flex", alignItems: "center" }}>
+                          <p style={{ fontSize: 14, color: highlight ? "#084D08" : "#545453", margin: 0, lineHeight: "20px" }}>{label}</p>
+                        </div>
+                        <div style={{ display: "flex", alignItems: "center", borderLeft: "1px solid #ECECEC", flexShrink: 0 }}>
+                          <div style={{ width: 40, display: "flex", alignItems: "center", justifyContent: "center", background: "#05A105", alignSelf: "stretch" }}>
+                            <span style={{ fontSize: 13, fontWeight: 700, color: "#FFFFFF" }}>{box}</span>
+                          </div>
+                          <div style={{ width: 140, padding: "16px 20px", textAlign: "right" }}>
+                            <span style={{ fontSize: 14, fontWeight: 500, color: highlight ? "#084D08" : "#080908" }}>{value}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )
+            ) : (
+              <div style={{ width: "100%", boxSizing: "border-box" }}>
+                {/* Search + filters (not sticky) */}
+                <div style={{ borderBottom: "1px solid #E9E9EB", background: "#FFFFFF", fontFamily: "'Inter', sans-serif" }}>
+                  <div style={{ display: "flex", alignItems: "center", padding: "0 16px", height: 80, borderBottom: "1px solid #ECECEC", gap: 10 }}>
+                    <svg width="18" height="18" viewBox="0 0 20 20" fill="none" style={{ flexShrink: 0 }}><path d="M17.5 17.5L13.875 13.875M15.833 9.167a6.667 6.667 0 1 1-13.333 0 6.667 6.667 0 0 1 13.333 0Z" stroke="#8C8C8B" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    <input type="text" value={tableSearch} onChange={e => setTableSearch(e.target.value)} placeholder="Search..." style={{ flex: 1, border: "none", outline: "none", background: "transparent", fontSize: 16, color: "#080908", fontFamily: "'Inter', sans-serif" }} />
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", padding: "12px 16px", gap: 8 }}>
+                    {(() => {
+                      const counts = { Priority: 0, Review: 0, Clear: 0 };
+                      VAT_ACCOUNT_TX.forEach((s, si) => s.rows.forEach((row, ri) => {
+                        const eff = (resolvedRowKeys.has(`${si}-${ri}`) || (row.cardIdx != null && (resolvedCards.has(row.cardIdx) || ignoredCards.has(row.cardIdx)))) ? "Clear" : row.status;
+                        if (counts[eff] != null) counts[eff] += 1;
+                      }));
+                      return ["Priority", "Review", "Clear"].map(opt => {
+                        const isActive = statusFilterSet.has(opt);
+                        const palette = VAT_STATUS_PALETTE[opt];
+                        return (
+                          <button key={opt}
+                            onClick={() => { const next = new Set(statusFilterSet); isActive ? next.delete(opt) : next.add(opt); setStatusFilterSet(next); }}
+                            style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 40, padding: "0 12px", border: `1px solid ${isActive ? "#05A105" : "#E9E9EB"}`, borderRadius: 8, background: isActive ? "#05A105" : "#FFFFFF", cursor: "pointer", fontSize: 14, fontWeight: 500, color: isActive ? "#FFFFFF" : "#080908", fontFamily: "'Inter', sans-serif", flexShrink: 0 }}>
+                            {labelMap[opt] || opt}
+                            <span style={{ fontSize: 12, fontWeight: 500, padding: "2px 7px", borderRadius: 4, background: isActive ? "#E8F5E8" : palette.background, color: isActive ? "#05A105" : palette.color }}>{counts[opt]}</span>
+                          </button>
+                        );
+                      });
+                    })()}
+                    <div style={{ position: "relative" }}>
+                      {(() => {
+                        const sel = [...accountFilterSet];
+                        const pill = (label) => (<span style={{ background: "#EBEBEB", borderRadius: 5, padding: "2px 7px", fontSize: 13, fontWeight: 500, color: "#080908", maxWidth: 110, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", display: "inline-block" }}>{label}</span>);
+                        const plusPill = (n) => (<span style={{ background: "#EBEBEB", borderRadius: 5, padding: "2px 7px", fontSize: 13, fontWeight: 500, color: "#080908", flexShrink: 0 }}>+{n}</span>);
+                        return (
+                      <button ref={accountFilterBtnRef} onClick={() => setAccountFilterOpen(o => !o)}
+                        style={{ display: "inline-flex", alignItems: "center", gap: 6, height: 40, padding: "0 10px 0 12px", border: "1px solid #E9E9EB", borderRadius: 8, background: accountFilterOpen ? "#F5F5F5" : "#FFFFFF", cursor: "pointer", fontSize: 14, fontWeight: 500, color: "#080908", fontFamily: "'Inter', sans-serif" }}
+                        onMouseEnter={e => { if (!accountFilterOpen) e.currentTarget.style.background = "#F5F5F5"; }}
+                        onMouseLeave={e => { if (!accountFilterOpen) e.currentTarget.style.background = "#FFFFFF"; }}>
+                        <span>Accounts</span>
+                        {sel.length > 0 && pill(sel[0])}
+                        {sel.length > 1 && plusPill(sel.length - 1)}
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ transition: "transform 0.2s", transform: accountFilterOpen ? "rotate(180deg)" : "rotate(0deg)" }}><path d="M4 6L8 10L12 6" stroke="#080908" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      </button>
+                        );
+                      })()}
+                      {accountFilterOpen && (
+                        <div ref={accountFilterDropRef} style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, background: "#FFFFFF", border: "1px solid #E9E9EB", borderRadius: 12, boxShadow: "0 8px 24px rgba(0,0,0,0.10)", zIndex: 999, width: 320, paddingTop: 12, fontFamily: "'Inter', sans-serif" }}>
+                          {/* Search */}
+                          <div style={{ margin: "0 16px 10px", display: "flex", alignItems: "center", gap: 10, border: "1.5px solid #E9E9EB", borderRadius: 8, padding: "10px 14px" }}>
+                            <svg width="18" height="18" viewBox="0 0 20 20" fill="none" style={{ flexShrink: 0 }}>
+                              <path d="M17.5 17.5L13.875 13.875M15.833 9.167A6.667 6.667 0 1 1 2.5 9.167a6.667 6.667 0 0 1 13.333 0Z" stroke="#8C8C8B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            <input value={accountFilterSearch} onChange={e => setAccountFilterSearch(e.target.value)} placeholder="Search accounts" style={{ border: "none", outline: "none", fontSize: 14, color: "#080908", background: "transparent", fontFamily: "'Inter', sans-serif", width: "100%" }} />
+                          </div>
+                          {/* Select all */}
+                          <div onClick={() => { if (accountFilterSet.size === ALL_ACCOUNT_NAMES.length) setAccountFilterSet(new Set()); else setAccountFilterSet(new Set(ALL_ACCOUNT_NAMES)); }}
+                            style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 24px", cursor: "pointer" }}
+                            onMouseEnter={e => e.currentTarget.style.background = "#FAFAFA"}
+                            onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                            <div style={{ width: 20, height: 20, borderRadius: 5, border: `1.5px solid ${accountFilterSet.size === ALL_ACCOUNT_NAMES.length ? "#05A105" : "#CFCFD1"}`, background: accountFilterSet.size === ALL_ACCOUNT_NAMES.length ? "#05A105" : "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                              {accountFilterSet.size === ALL_ACCOUNT_NAMES.length && <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M10 3L4.5 8.5L2 6" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                            </div>
+                            <span style={{ fontSize: 14, fontWeight: 500, color: "#080908" }}>Select all ({ALL_ACCOUNT_NAMES.length})</span>
+                          </div>
+                          <div style={{ height: 1, background: "#E9E9EB", margin: "6px 0" }} />
+                          {/* Account list */}
+                          <div style={{ maxHeight: 280, overflowY: "auto", paddingBottom: 8 }}>
+                            {ALL_ACCOUNT_NAMES.filter(n => n.toLowerCase().includes(accountFilterSearch.toLowerCase())).map(opt => {
+                              const isChecked = accountFilterSet.has(opt);
+                              return (
+                                <div key={opt} onClick={() => { const next = new Set(accountFilterSet); isChecked ? next.delete(opt) : next.add(opt); setAccountFilterSet(next); }}
+                                  style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 24px", cursor: "pointer" }}
+                                  onMouseEnter={e => e.currentTarget.style.background = "#FAFAFA"}
+                                  onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                                  <div style={{ width: 20, height: 20, borderRadius: 5, border: `1.5px solid ${isChecked ? "#05A105" : "#CFCFD1"}`, background: isChecked ? "#05A105" : "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                    {isChecked && <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M10 3L4.5 8.5L2 6" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                                  </div>
+                                  <span style={{ fontSize: 14, color: "#080908" }}>{opt}</span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+
+        {/* Drag handle between canvas and sidebar */}
+        {resultsVisible && boxesOpen && canvasReady && (
+          <div
+            onMouseDown={e => { e.preventDefault(); setIsDraggingSidebar(true); if (sidebarWidth === null && containerRef.current) { const rect = containerRef.current.getBoundingClientRect(); setSidebarWidth(Math.round((rect.width - (chatPanelOpen ? chatWidth + 64 : 48)) / 2 - 8)); } }}
+            style={{ position: "absolute", top: 16, bottom: 16, zIndex: 5, cursor: "col-resize", width: 16, display: "flex", alignItems: "center", justifyContent: "center",
+              right: sidebarWidth !== null ? sidebarWidth + 16 : (chatPanelOpen ? `calc(50% - ${Math.round(chatWidth / 2)}px)` : "calc(50% + 0px)"),
+            }}
+          >
+            <div style={{ width: 4, height: 40, borderRadius: 2, background: "#CFCFD1" }} />
+          </div>
+        )}
+                    </div>
+                    {(statusFilterSet.size > 0 || accountFilterSet.size > 0) && (
+                      <button
+                        onClick={() => { setStatusFilterSet(new Set()); setAccountFilterSet(new Set()); }}
+                        style={{ display: "inline-flex", alignItems: "center", gap: 6, height: 40, padding: "0 10px", border: "none", borderRadius: 8, background: "none", cursor: "pointer", fontSize: 14, fontWeight: 500, color: "#080908", fontFamily: "'Inter', sans-serif" }}
+                        onMouseEnter={e => e.currentTarget.style.background = "#F5F5F5"}
+                        onMouseLeave={e => e.currentTarget.style.background = "none"}>
+                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M10 2L2 10M2 2L10 10" stroke="#080908" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                        Reset
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Group by contact toggle */}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", padding: "8px 16px", borderBottom: "1px solid #E9E9EB", background: "#FFFFFF" }}>
+                  <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: 14, color: "#080908", fontFamily: "'Inter', sans-serif", userSelect: "none" }}>
+                    Group findings by contact
+                    <span
+                      onClick={() => setGroupByContact(g => !g)}
+                      style={{ display: "inline-flex", width: 36, height: 20, borderRadius: 10, background: groupByContact ? "#05A105" : "#CFCFD1", cursor: "pointer", alignItems: "center", padding: "0 2px", transition: "background 0.2s", flexShrink: 0 }}>
+                      <span style={{ width: 16, height: 16, borderRadius: "50%", background: "#FFFFFF", transform: groupByContact ? "translateX(16px)" : "translateX(0)", transition: "transform 0.2s" }} />
+                    </span>
+                  </label>
+                </div>
+
+
+                {groupByContact ? (() => {
+                  // Build grouped data
+                  const grouped = {};
+                  VAT_ACCOUNT_TX.forEach(section => {
+                    section.rows.forEach(row => {
+                      const contact = row.description?.split(":")[0]?.trim() || section.account || "Unknown";
+                      if (!grouped[contact]) grouped[contact] = { contact, vatNumber: "—", findings: 0, exposure: 0, critical: 0, high: 0, medLow: 0, topIssue: null };
+                      grouped[contact].findings += 1;
+                      const amt = parseFloat((row.debitGbp || row.creditGbp || 0));
+                      grouped[contact].exposure += amt;
+                      if (row.status === "Priority") { grouped[contact].critical += 1; if (!grouped[contact].topIssue) grouped[contact].topIssue = row.vat || "Invoice VAT mismatch"; }
+                      else if (row.status === "Review") { grouped[contact].high += 1; if (!grouped[contact].topIssue) grouped[contact].topIssue = row.vat || "Invoice VAT mismatch"; }
+                      else { grouped[contact].medLow += 1; }
+                    });
+                  });
+                  const rows = Object.values(grouped).sort((a, b) => b.findings - a.findings);
+                  const fmt = n => "£" + n.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                  const colW = "minmax(160px, 1fr) 140px 110px 140px 80px 80px 100px minmax(160px, 1fr)";
+                  const headers = ["Contact", "VAT Number", "Findings", "Exposure £", "Critical", "High", "Medium/Low", "Top issue"];
+                  return (
+                    <div style={{ overflowX: "auto", flex: 1 }}>
+                      <div style={{ display: "grid", gridTemplateColumns: colW, minWidth: 1000 }}>
+                        {/* Header */}
+                        {headers.map((h, i) => (
+                          <div key={h} style={{ padding: "12px 16px", background: "#FAFAFA", borderBottom: "1px solid #E9E9EB", borderRight: i < headers.length - 1 ? "1px solid #E9E9EB" : "none", fontSize: 13, fontWeight: 500, color: "#7C7C7C", whiteSpace: "nowrap" }}>{h}</div>
+                        ))}
+                        {/* Rows */}
+                        {rows.map((r, ri) => {
+                          const isLast = ri === rows.length - 1;
+                          const bb = isLast ? "none" : "1px solid #E9E9EB";
+                          const cell = (content, key, align) => (
+                            <div key={key} style={{ padding: "14px 16px", borderBottom: bb, borderRight: "1px solid #E9E9EB", fontSize: 14, color: "#080908", textAlign: align || "left", display: "flex", alignItems: "center" }}>
+                              {content}
+                            </div>
+                          );
+                          return (
+                            <React.Fragment key={r.contact}>
+                              {cell(<span style={{ fontWeight: 500 }}>{r.contact}</span>, "contact")}
+                              {cell(r.vatNumber, "vat")}
+                              {cell(<span style={{ fontWeight: 600 }}>{r.findings}</span>, "findings", "center")}
+                              {cell(fmt(r.exposure), "exp", "right")}
+                              {cell(r.critical > 0 ? <span style={{ color: "#C8543A", fontWeight: 500 }}>{r.critical}</span> : "0", "crit", "center")}
+                              {cell(r.high > 0 ? <span style={{ color: "#D5A750", fontWeight: 500 }}>{r.high}</span> : "0", "high", "center")}
+                              {cell(r.medLow > 0 ? <span style={{ color: "#8C8C8B", fontWeight: 500 }}>{r.medLow}</span> : "0", "med", "center")}
+                              <div style={{ padding: "14px 16px", borderBottom: bb, fontSize: 14, color: "#545453", display: "flex", alignItems: "center" }}>{r.topIssue || "—"}</div>
+                            </React.Fragment>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })() :
+
+                {(() => {
+                  const ACCOUNT_TX = VAT_ACCOUNT_TX;
+                  const STATUS_STYLES = {
+                    Priority: { background: "#FCEFEC", color: "#C8543A" },
+                    Review:   { background: "#FDF8EE", color: "#D5A750" },
+                    Clear:    { background: "#F1F8F0", color: "#05A105" },
+                  };
+                  const fmt = n => n == null ? "-" : n.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                  const anyFilterActive = statusFilterSet.size > 0 || accountFilterSet.size > 0 || !!tableSearch;
+                  const cols = [
+                    { key: "status",     label: "Status",              width: "110px" },
+                    { key: "date",       label: "Date",                width: "130px" },
+                    { key: "source",     label: "Source",              width: "140px" },
+                    { key: "description",label: "Description",         width: "minmax(280px, 1fr)" },
+                    { key: "ref",        label: "Reference",           width: "200px" },
+                    { key: "currency",   label: "Currency",            width: "100px" },
+                    { key: "debitSrc",   label: "Debit (Source)",      width: "140px", align: "right" },
+                    { key: "creditSrc",  label: "Credit (Source)",     width: "150px", align: "right" },
+                    { key: "debitGbp",   label: "Debit (GBP)",         width: "130px", align: "right" },
+                    { key: "creditGbp",  label: "Credit (GBP)",        width: "130px", align: "right" },
+                    { key: "running",    label: "Running Balance (GBP)", width: "200px", align: "right" },
+                    { key: "vat",        label: "VAT Rate Name",       width: "180px" },
+                  ];
+                  const gridTpl = cols.map(c => typeof c.width === "string" && c.width.startsWith("minmax(") ? c.width : c.width).join(" ");
+                  return (
+                    <div style={{ position: "relative", background: "#FFFFFF", fontFamily: "'Inter', sans-serif" }}>
+                      {/* Sticky header (horizontal scroll synced with body) */}
+                      <div style={{ position: "sticky", top: 0, zIndex: 5, background: "#FFFFFF", borderBottom: "1px solid #E9E9EB" }}>
+                        <div ref={txHeaderRef} style={{ overflow: "hidden" }}>
+                          <div style={{ width: "100%", minWidth: 1890, display: "grid", gridTemplateColumns: gridTpl, background: "#FFFFFF" }}>
+                            {cols.map((col, ci) => {
+                              const isSortable = true;
+                              const isActive = txSortKey === col.key;
+                              return (
+                                <div key={col.key}
+                                  onClick={() => { if (!isSortable) return; if (txSortKey === col.key) { setTxSortDir(d => d === "asc" ? "desc" : "asc"); } else { setTxSortKey(col.key); setTxSortDir("asc"); } }}
+                                  style={{ display: "flex", alignItems: "center", height: 48, padding: "0 16px", fontSize: 14, fontWeight: 400, color: isActive ? "#080908" : "#7C7C7C", borderRight: ci < cols.length - 1 ? "1px solid #E9E9EB" : "none", whiteSpace: "nowrap", justifyContent: col.align === "right" ? "flex-end" : "flex-start", cursor: isSortable ? "pointer" : "default", userSelect: "none", gap: 4, overflow: "hidden", textOverflow: "ellipsis" }}
+                                  onMouseEnter={e => { if (isSortable) { e.currentTarget.style.color = "#080908"; e.currentTarget.style.background = "#F5F5F5"; const hint = e.currentTarget.querySelector(".tx-sort-hint"); if (hint) hint.style.opacity = "1"; } }}
+                                  onMouseLeave={e => { if (isSortable) { if (!isActive) e.currentTarget.style.color = "#7C7C7C"; e.currentTarget.style.background = "transparent"; const hint = e.currentTarget.querySelector(".tx-sort-hint"); if (hint) hint.style.opacity = "0"; } }}>
+                                  {col.label}
+                                  {isActive ? (
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0, marginLeft: 2, transform: txSortDir === "desc" ? "rotate(180deg)" : "none", transition: "transform 0.15s" }}>
+                                      <path d="M12 19V5M19 12L12 5L5 12" stroke="#080908" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"/>
+                                    </svg>
+                                  ) : (
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0, marginLeft: 2, opacity: 0 }} className="tx-sort-hint">
+                                      <path d="M12 19V5M19 12L12 5L5 12" stroke="#8C8C8B" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"/>
+                                    </svg>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                      <div ref={txScrollRef} onScroll={e => { const el = e.currentTarget; if (txHeaderRef.current) txHeaderRef.current.scrollLeft = el.scrollLeft; setTxRightShadow(el.scrollWidth - el.clientWidth - el.scrollLeft > 1); }} style={{ position: "relative", overflowX: "auto" }}>
+                      <div style={{ width: "100%", minWidth: 1890 }}>
+                        {/* Sections */}
+                        {ACCOUNT_TX.slice().sort((a, b) => a.account.localeCompare(b.account)).map((section, si) => {
+                          if (accountFilterSet.size > 0 && !accountFilterSet.has(section.account)) return null;
+                          const effectiveStatus = (row) => (resolvedRowKeys.has(`${si}-${row._ri}`) || (row.cardIdx != null && (resolvedCards.has(row.cardIdx) || ignoredCards.has(row.cardIdx)))) ? "Clear" : row.status;
+                          const rowsWithRi = section.rows.map((row, ri) => Object.assign({}, row, { _ri: ri }));
+                          const filteredRows = rowsWithRi.filter(row => (statusFilterSet.size === 0 || statusFilterSet.has(effectiveStatus(row))) && (!tableSearch || [row.description, row.ref, row.source, row.date, row.currency, row.vat].some(v => v && String(v).toLowerCase().includes(tableSearch.toLowerCase()))));
+                          if (filteredRows.length === 0) return null;
+                          return (
+                          <React.Fragment key={section.account}>
+                            {/* Account header row */}
+                            <div style={{ display: "grid", gridTemplateColumns: gridTpl, borderBottom: "1px solid #E9E9EB", background: "#FAFAFA" }}>
+                              <div style={{ gridColumn: "1 / -1", display: "flex", alignItems: "center", height: 56, padding: "0 16px", fontSize: 16, fontWeight: 500, color: "#080908", letterSpacing: "-0.1px" }}>
+                                {section.account}
+                              </div>
+                            </div>
+                            {/* Opening Balance — only for balance-sheet accounts */}
+                            {!anyFilterActive && section.opening != null && (section.account === "Accounts Payable" || section.account === "Accruals") && (
+                              <div style={{ display: "grid", gridTemplateColumns: gridTpl, borderBottom: "1px solid #E9E9EB", background: "#FFFFFF" }}>
+                                <div style={{ gridColumn: "1 / 7", display: "flex", alignItems: "center", height: 56, padding: "0 16px", fontSize: 14, color: "#080908", fontWeight: 500, borderRight: "1px solid #E9E9EB", whiteSpace: "nowrap" }}>
+                                  Opening Balance
+                                </div>
+                                {[
+                                  { key: "debitSrc",  value: null },
+                                  { key: "creditSrc", value: null },
+                                  { key: "debitGbp",  value: null },
+                                  { key: "creditGbp", value: null },
+                                  { key: "running",   value: section.opening },
+                                  { key: "vat",       value: null },
+                                ].map((c, ci) => (
+                                  <div key={c.key} style={{ display: "flex", alignItems: "center", height: 56, padding: "0 16px", fontSize: 14, color: "#080908", fontWeight: c.value != null ? 600 : 400, borderRight: ci < 5 ? "1px solid #E9E9EB" : "none", whiteSpace: "nowrap", justifyContent: c.key === "vat" ? "flex-start" : "flex-end" }}>
+                                    {c.value != null ? fmt(c.value) : "-"}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                            {/* Data rows */}
+                            {(() => {
+                              if (!txSortKey) return filteredRows;
+                              const sorted = [...filteredRows].sort((a, b) => {
+                                let av = a[txSortKey];
+                                let bv = b[txSortKey];
+                                if (txSortKey === "date") { av = new Date(a.date).getTime(); bv = new Date(b.date).getTime(); }
+                                else if (["debitSrc","creditSrc","debitGbp","creditGbp","running"].includes(txSortKey)) { av = av == null ? -Infinity : av; bv = bv == null ? -Infinity : bv; }
+                                else { av = av == null ? "" : String(av).toLowerCase(); bv = bv == null ? "" : String(bv).toLowerCase(); }
+                                if (av < bv) return txSortDir === "asc" ? -1 : 1;
+                                if (av > bv) return txSortDir === "asc" ? 1 : -1;
+                                return 0;
+                              });
+                              return sorted;
+                            })().map((row, ri) => {
+                              const rowKey = `${si}-${row._ri != null ? row._ri : ri}`;
+                              const isSelected = selectedRow && selectedRow.key === rowKey;
+                              const clickable = row.cardIdx != null;
+                              return (
+                              <div key={ri} data-tx-row="1" onClick={() => {
+                                if (!clickable) return;
+                                if (isSelected) {
+                                  setSelectedRow(null);
+                                  return;
+                                }
+                                setSelectedRow({ key: rowKey, cardIdx: row.cardIdx });
+                                if (!boxesOpen) setBoxesOpen(true);
+                                const cat = VAT_CARDS[row.cardIdx] && VAT_CARDS[row.cardIdx].cat;
+                                if (cat != null) {
+                                  setTimeout(() => {
+                                    const localIdx = VAT_CARDS.filter(c => c.cat === cat).findIndex(c => c.idx === row.cardIdx);
+                                    const target = document.getElementById(`result-${cat}-${localIdx}`);
+                                    if (!target) return;
+                                    let parent = target.parentElement;
+                                    while (parent && getComputedStyle(parent).overflowY !== "auto" && getComputedStyle(parent).overflowY !== "scroll") {
+                                      parent = parent.parentElement;
+                                    }
+                                    if (parent) {
+                                      const top = target.getBoundingClientRect().top - parent.getBoundingClientRect().top + parent.scrollTop;
+                                      parent.scrollTo({ top, behavior: "smooth" });
+                                    }
+                                  }, 400);
+                                }
+                              }}
+                                style={{ display: "grid", gridTemplateColumns: gridTpl, borderBottom: "1px solid #E9E9EB", background: isSelected ? "#F4FBF1" : "#FFFFFF", transition: "background 0.1s", cursor: clickable ? "pointer" : "default" }}
+                                onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = "#FAFAFA"; }}
+                                onMouseLeave={e => { if (!isSelected) e.currentTarget.style.background = "#FFFFFF"; }}>
+                                {cols.map((col, ci) => {
+                                  let v = row[col.key];
+                                  if (col.key === "debitSrc" || col.key === "creditSrc" || col.key === "debitGbp" || col.key === "creditGbp" || col.key === "running") {
+                                    v = v == null ? "-" : fmt(v);
+                                  }
+                                  const isStatus = col.key === "status";
+                                  if (isStatus && (resolvedRowKeys.has(rowKey) || (row.cardIdx != null && (resolvedCards.has(row.cardIdx) || ignoredCards.has(row.cardIdx))))) {
+                                    v = "Clear";
+                                  }
+                                  const st = isStatus && v ? STATUS_STYLES[v] : null;
+                                  return (
+                                    <div key={col.key} style={{ display: "flex", alignItems: "center", padding: "12px 16px", fontSize: 14, color: "#080908", borderRight: ci < cols.length - 1 ? "1px solid #E9E9EB" : "none", overflow: "hidden", whiteSpace: col.key === "description" ? "normal" : "nowrap", textOverflow: "ellipsis", justifyContent: col.align === "right" ? "flex-end" : "flex-start", lineHeight: "20px" }}>
+                                      {isStatus && st
+                                        ? <span style={{ fontSize: 12, fontWeight: 500, padding: "2px 8px", borderRadius: 4, background: st.background, color: st.color, whiteSpace: "nowrap" }}>{v}</span>
+                                        : (v || "-")}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                              );
+                            })}
+                            {/* Total + Closing Balance */}
+                            {(() => {
+                              const totals = section.rows.reduce((acc, r) => ({
+                                debitSrc: acc.debitSrc + (r.debitSrc || 0),
+                                creditSrc: acc.creditSrc + (r.creditSrc || 0),
+                                debitGbp: acc.debitGbp + (r.debitGbp || 0),
+                                creditGbp: acc.creditGbp + (r.creditGbp || 0),
+                              }), { debitSrc: 0, creditSrc: 0, debitGbp: 0, creditGbp: 0 });
+                              const closing = section.opening != null ? (section.rows.length ? section.rows[section.rows.length - 1].running : section.opening) : null;
+                              const totalRunning = section.opening != null ? closing : (totals.debitGbp - totals.creditGbp || totals.debitGbp || totals.creditGbp);
+                              const totalCells = [
+                                { key: "debitSrc",  value: totals.debitSrc },
+                                { key: "creditSrc", value: totals.creditSrc },
+                                { key: "debitGbp",  value: totals.debitGbp },
+                                { key: "creditGbp", value: totals.creditGbp },
+                                { key: "running",   value: totalRunning },
+                                { key: "vat",       value: null },
+                              ];
+                              return (
+                                <>
+                                  {/* Total row */}
+                                  <div style={{ display: "grid", gridTemplateColumns: gridTpl, borderBottom: "1px solid #E9E9EB", background: "#FFFFFF" }}>
+                                    <div style={{ gridColumn: "1 / 7", display: "flex", alignItems: "center", height: 56, padding: "0 16px", fontSize: 14, color: "#080908", fontWeight: 500, borderRight: "1px solid #E9E9EB", whiteSpace: "nowrap" }}>
+                                      Total {section.account}
+                                    </div>
+                                    {totalCells.map((c, ci) => (
+                                      <div key={c.key} style={{ display: "flex", alignItems: "center", height: 56, padding: "0 16px", fontSize: 14, color: "#080908", fontWeight: c.value ? 600 : 400, borderRight: ci < 5 ? "1px solid #E9E9EB" : "none", whiteSpace: "nowrap", justifyContent: c.key === "vat" ? "flex-start" : "flex-end" }}>
+                                        {c.value ? fmt(c.value) : "-"}
+                                      </div>
+                                    ))}
+                                  </div>
+                                  {/* Closing Balance row — only for balance-sheet accounts */}
+                                  {!anyFilterActive && section.opening != null && (section.account === "Accounts Payable" || section.account === "Accruals") && (
+                                    <div style={{ display: "grid", gridTemplateColumns: gridTpl, borderBottom: "1px solid #E9E9EB", background: "#FFFFFF" }}>
+                                      <div style={{ gridColumn: "1 / 7", display: "flex", alignItems: "center", height: 56, padding: "0 16px", fontSize: 14, color: "#080908", fontWeight: 500, borderRight: "1px solid #E9E9EB", whiteSpace: "nowrap" }}>
+                                        Closing Balance
+                                      </div>
+                                      {[
+                                        { key: "debitSrc",  value: null },
+                                        { key: "creditSrc", value: null },
+                                        { key: "debitGbp",  value: null },
+                                        { key: "creditGbp", value: null },
+                                        { key: "running",   value: closing },
+                                        { key: "vat",       value: null },
+                                      ].map((c, ci) => (
+                                        <div key={c.key} style={{ display: "flex", alignItems: "center", height: 56, padding: "0 16px", fontSize: 14, color: "#080908", fontWeight: c.value != null ? 600 : 400, borderRight: ci < 5 ? "1px solid #E9E9EB" : "none", whiteSpace: "nowrap", justifyContent: c.key === "vat" ? "flex-start" : "flex-end" }}>
+                                          {c.value != null ? fmt(c.value) : "-"}
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                </>
+                              );
+                            })()}
+                          </React.Fragment>
+                          );
+                        })}
+                      </div>
+                    </div>
+                    {txRightShadow && (
+                      <div style={{ position: "absolute", top: 0, right: 0, bottom: 0, width: 24, boxShadow: "inset -8px 0 12px -8px rgba(0,0,0,0.18)", pointerEvents: "none", zIndex: 6 }} />
+                    )}
+                    </div>
+                })()}
+                }
+                })()}
+              </div>
+            )}
+          </div>
+          </div>
+        )}
+      </div>
+
+      {/* Toast */}
+      {toast && (
+        <div style={{ position: "fixed", top: 24, left: "50%", transform: "translateX(-50%)", background: "#05A105", color: "#FFFFFF", padding: "12px 20px", borderRadius: 10, fontSize: 14, fontWeight: 500, display: "flex", alignItems: "center", gap: 10, zIndex: 300, animation: "toastIn 0.35s ease", fontFamily: "'Inter', sans-serif" }}>
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ flexShrink: 0 }}>
+            <path d="M10 18.3333C14.6024 18.3333 18.3333 14.6024 18.3333 10C18.3333 5.39763 14.6024 1.66667 10 1.66667C5.39763 1.66667 1.66667 5.39763 1.66667 10C1.66667 14.6024 5.39763 18.3333 10 18.3333Z" fill="rgba(255,255,255,0.25)"/>
+            <path d="M6.66667 10L8.88889 12.2222L13.3333 7.77778" stroke="#FFFFFF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          {toast}
+        </div>
+      )}
+
+      {/* Audit trail sidebar */}
+      {auditTrailOpen && <AuditTrailSidebar onClose={() => setAuditTrailOpen(false)} accountName="VAT review" period={activePeriod} liveEntries={vatAuditEntries} />}
+
+      {/* Document preview panel — opened from "Review invoice" */}
+      {vatPreviewRow && (
+        <ReviewPublishPanel
+          contact={vatPreviewRow.contact}
+          amount={vatPreviewRow.amount}
+          date={vatPreviewRow.date}
+          fileName={vatPreviewRow.fileName}
+          docStatus={vatPreviewRow.status}
+          bankMatch={vatPreviewRow.bankMatch}
+          account={vatPreviewRow.account}
+          type={vatPreviewRow.type}
+          isDuplicate={false}
+          confirmMode={true}
+          reasoningText={vatPreviewRow.description || null}
+          currentVat={vatPreviewRow.vatFrom && typeof vatPreviewRow.vatFrom === "object" ? vatPreviewRow.vatFrom.text : (vatPreviewRow.vatFrom || "")}
+          suggestedVat={vatPreviewRow.vatTo && vatPreviewRow.vatTo !== "—" ? vatPreviewRow.vatTo : ""}
+          onClose={closeVatPreview}
+          onPublish={() => {
+            const { cardIdx, cardTitle, contact, amount, date, vatFrom, vatTo } = vatPreviewRow;
+            const vatFromText = vatFrom && typeof vatFrom === "object" ? vatFrom.text : vatFrom;
+            const changeDesc = vatTo && vatTo !== "—" ? `VAT code changed: ${vatFromText} → ${vatTo}.` : `VAT treatment confirmed via invoice review (was: ${vatFromText}).`;
+            const targetRowKey = selectedRow && selectedRow.cardIdx === cardIdx ? selectedRow.key : null;
+            closeVatPreview();
+            setTimeout(() => {
+              if (targetRowKey) {
+                setResolvedRowKeys(prev => new Set([...prev, targetRowKey]));
+              } else {
+                setResolvedCards(prev => new Set([...prev, cardIdx]));
+              }
+              setSelectedRow(prev => prev && prev.cardIdx === cardIdx ? null : prev);
+              addVatAuditEntry(
+                "VAT suggestion resolved",
+                `${cardTitle} – ${contact}, ${amount}, ${date}. ${changeDesc}`,
+                "#05A105"
+              );
+              setToast("Document confirmed");
+              setTimeout(() => setToast(null), 3000);
+            }, 420);
+          }}
+          onIgnore={() => {
+            const { cardIdx, cardTitle, contact, amount, date } = vatPreviewRow;
+            const targetRowKey = selectedRow && selectedRow.cardIdx === cardIdx ? selectedRow.key : null;
+            closeVatPreview();
+            setTimeout(() => {
+              if (targetRowKey) {
+                setResolvedRowKeys(prev => new Set([...prev, targetRowKey]));
+              } else {
+                setIgnoredCards(prev => new Set([...prev, cardIdx]));
+              }
+              setSelectedRow(prev => prev && prev.cardIdx === cardIdx ? null : prev);
+              addVatAuditEntry(
+                "VAT suggestion ignored",
+                `${cardTitle} – ${contact}, ${amount}, ${date}. Suggestion ignored via document review.`,
+                "#8C8C8B"
+              );
+              setToast("Suggestion ignored");
+              setTimeout(() => setToast(null), 3000);
+            }, 420);
+          }}
+          onDelete={closeVatPreview}
+          onArchive={closeVatPreview}
+          onKeep={closeVatPreview}
+        />
+      )}
+    </div>
+  );
+}
+
 // ── Client Baseline Flow (copy of VATReviewFlow for client-baseline tweaks) ─
 function ClientBaselineFlow({ onClose, onStartVATReview, selectedPeriod = "April 2026", resolvedCards, setResolvedCards, ignoredCards, setIgnoredCards, showResults = false }) {
   const [stepStatuses, setStepStatuses] = useState(showResults ? VAT_STEPS.map(() => "done") : []);
@@ -13504,7 +14974,7 @@ function ClientBaselineFlow({ onClose, onStartVATReview, selectedPeriod = "April
   const [selectedRow, setSelectedRow] = useState(null); // { key, cardIdx }
   const selectedCardIdx = selectedRow ? selectedRow.cardIdx : null;
   const stepsComplete = stepStatuses.length > 0 && stepStatuses.every(s => s === "done");
-  const totalSuggestions = VAT_CARDS.length;
+  const totalSuggestions = VAT_CARDS_BASELINE.length;
 
   // Typewriter messages — defined before effects so introDone is in scope
   const introSegments = rerunKey === 0 ? [
@@ -13709,7 +15179,7 @@ function ClientBaselineFlow({ onClose, onStartVATReview, selectedPeriod = "April
 
   const catOrder = ["uncertain", "wrong-code", "reverse-charge", "non-reclaimable", "pva"];
   const groupedCards = catOrder.reduce((acc, key) => {
-    const items = VAT_CARDS.filter(c => c.cat === key);
+    const items = VAT_CARDS_BASELINE.filter(c => c.cat === key);
     if (items.length) acc.push({ key, items });
     return acc;
   }, []);
@@ -13820,7 +15290,7 @@ function ClientBaselineFlow({ onClose, onStartVATReview, selectedPeriod = "April
       </div>
 
       {/* Content area — identical structure to ReconciliationFlow */}
-      <div style={{ display: "flex", flex: 1, overflow: "hidden", position: "relative", padding: 16 }}>
+      <div ref={containerRef} style={{ display: "flex", flex: 1, overflow: "hidden", position: "relative", padding: 16, cursor: isDraggingSidebar ? "col-resize" : undefined }}>
 
         {/* Left chat panel — full width until canvas appears, then transitions to sidebar */}
         <div style={{ display: "none", flexDirection: "column", width: resultsVisible ? chatWidth : "100%", flexShrink: 0, transition: isDragging ? "none" : "width 0.72s cubic-bezier(0.16, 1, 0.3, 1)", overflow: "hidden", willChange: "width", position: "relative", zIndex: 1 }}>
@@ -14137,7 +15607,6 @@ function ClientBaselineFlow({ onClose, onStartVATReview, selectedPeriod = "April
                 <div style={{ display: "flex", flexDirection: "column" }}>
                   {groupedCards.map((group, gi) => (
                     <div key={group.key}>
-                      {gi > 0 && <div style={{ height: 32 }} />}
                       <h3 style={{ fontSize: 15, fontWeight: 500, color: "#080908", margin: "0 0 16px" }}>{VAT_CAT_LABELS[group.key] || group.key}</h3>
                       <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
                         {group.items.map((card, localIdx) => {
@@ -14156,7 +15625,7 @@ function ClientBaselineFlow({ onClose, onStartVATReview, selectedPeriod = "April
                                 collapsed={isResolved || isIgnored}
                                 isIgnored={isIgnored}
                                 tableRow={card.tableRow}
-                                primaryLabel="Accept"
+                                primaryLabel="Accept suggestion"
                                 dangerLabel="Reject"
                                 secondaryLabel="Journal lines"
                                 onPrimaryAction={() => {
@@ -15234,7 +16703,7 @@ function VATReturnFlow({ onClose, selectedPeriod = "April 2026" }) {
 
       {/* Top bar */}
       <div style={{ height: 96, background: "#FFFFFF", borderBottom: "1px solid #ECECEC", display: "flex", alignItems: "center", padding: "0 24px", flexShrink: 0, gap: 16, zIndex: 10, position: "relative" }}>
-        <span style={{ fontSize: 24, fontWeight: 500, color: "#080908", letterSpacing: "-1px" }}>VAT Return</span>
+        <span style={{ fontSize: 24, fontWeight: 500, color: "#080908", letterSpacing: "-1px" }}>{`Monthly VAT Return ${selectedPeriod ? (() => { const [m, y] = selectedPeriod.split(" "); const months = {"January":31,"February":28,"March":31,"April":30,"May":31,"June":30,"July":31,"August":31,"September":30,"October":31,"November":30,"December":31}; const abbr = {"January":"Jan","February":"Feb","March":"Mar","April":"Apr","May":"May","June":"Jun","July":"Jul","August":"Aug","September":"Sep","October":"Oct","November":"Nov","December":"Dec"}; const days = months[m] || 30; return `1 ${abbr[m]} ${y} – ${days} ${abbr[m]} ${y}`; })() : ""}`}</span>
 
         {/* Multi-period dropdown */}
         <div ref={periodDropRef} style={{ position: "relative" }}>
@@ -19885,11 +21354,22 @@ function InboxPage({ onUploadDocuments, externalUploadedFiles }) {
 }
 
 // ── VAT Review page ───────────────────────────────────────────────────────────
-function VATReviewPage({ onStartClientBaseline, onStartVATReview, baselineConfigured = false, configuredDate = "", configuredTime = "", onMarkConfigured, resolvedCards = new Set(), ignoredCards = new Set(), vatReviewCompleted = false, vatResolvedCards = new Set(), vatIgnoredCards = new Set() }) {
+function VATReviewPage({ onStartClientBaseline, onStartVATReview, onStartVATReviewV2, selectedPeriod = "April 2026", baselineConfigured = false, configuredDate = "", configuredTime = "", onMarkConfigured, resolvedCards = new Set(), ignoredCards = new Set(), vatReviewCompleted = false, vatResolvedCards = new Set(), vatIgnoredCards = new Set() }) {
   const [bannerDismissed, setBannerDismissed] = useState(false);
   const [vatModalOpen, setVatModalOpen] = useState(false);
   const [reviewSidebarOpen, setReviewSidebarOpen] = useState(false);
   const [downloadState, setDownloadState] = useState("idle"); // "idle" | "downloading" | "done"
+  const [vatPeriodDropOpen, setVatPeriodDropOpen] = useState(false);
+  const vatPeriodOptions = [
+    "Apr 2026 (Current)",
+    "Mar 2026",
+    "Feb 2026",
+    "Jan 2026",
+    "Dec 2025",
+    "Nov 2025",
+    "Oct 2025",
+  ];
+  const [selectedVatPeriod, setSelectedVatPeriod] = useState(vatPeriodOptions[0]);
   const confirmSetup = () => {
     onMarkConfigured?.();
     setVatModalOpen(false);
@@ -19950,37 +21430,34 @@ function VATReviewPage({ onStartClientBaseline, onStartVATReview, baselineConfig
       document.head.appendChild(script);
     }
   };
+  const empty = vatReviewCompleted ? null : "–";
   const rows = [
-    { box: 1, label: "VAT due on sales and other outputs", value: "£3,211.44" },
-    { box: 2, label: "VAT due on intra-community acquisitions of goods made in Northern Ireland from EU Member States", value: "£0.00" },
-    { box: 3, label: "Total VAT due (the sum of boxes 1 and 2)", value: "£3,211.44" },
-    { box: 4, label: "VAT reclaimed on purchases and other inputs (including acquisitions from the EU)", value: "£1,097.56" },
-    { box: 5, label: "Net VAT to be paid to Customs or reclaimed by you (difference between boxes 3 and 4)", value: "£2,113.88", highlight: true },
-    { box: 6, label: "Total value of sales and all other outputs excluding any VAT", value: "£16,057" },
-    { box: 7, label: "Total value of purchases and all other inputs excluding any VAT", value: "£5,488" },
-    { box: 8, label: "Total value of intra-community dispatches of goods and related costs, excluding any VAT, from Northern Ireland to EU Member States", value: "£0" },
-    { box: 9, label: "Total value of intra-community acquisitions of goods and related costs, excluding any VAT, made in Northern Ireland from EU Member States", value: "£0" },
+    { box: 1, label: "VAT due in the period on sales and other outputs",                                                                value: empty || "£3,211.44", section: "VAT Calculations" },
+    { box: 2, label: "VAT due in the period on acquisitions of goods made in Northern Ireland from EU Member States",                    value: empty || "£0.00" },
+    { box: 3, label: "Total VAT due (the sum of boxes 1 and 2)",                                                                        value: empty || "£3,211.44" },
+    { box: 4, label: "VAT reclaimed in the period on purchases and other inputs (including acquisitions from the EU)",                   value: empty || "£1,097.56" },
+    { box: 5, label: "VAT to Pay HMRC",                                                                                                 value: empty || "£2,113.88", highlight: true, bold: true },
+    { box: 6, label: "Total value of sales and all other outputs excluding any VAT",                                                     value: empty || "£16,057",   section: "Sales and Purchases Excluding VAT" },
+    { box: 7, label: "Total value of purchases and all other inputs excluding any VAT",                                                  value: empty || "£5,488" },
+    { box: 8, label: "Total value of all supplies of goods and related costs, excluding any VAT, to EU member states",                   value: empty || "£0",        section: "EC Supplies and Purchases Excluding VAT" },
+    { box: 9, label: "Total value of all acquisitions of goods and related costs, excluding any VAT, from EU member states",             value: empty || "£0" },
   ];
   return (
     <>
       {/* Page header */}
       <div style={{ padding: "32px 48px 32px", flexShrink: 0, background: "#FFFFFF" }}>
-        <div style={{ maxWidth: 1440, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <h1 style={{ fontSize: 36, fontWeight: 500, color: "#080908", lineHeight: "44px", letterSpacing: "-1px" }}>VAT Review</h1>
+        <div style={{ maxWidth: 1440, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
+          <h1 style={{ fontSize: 36, fontWeight: 500, color: "#080908", lineHeight: "44px", letterSpacing: "-1px" }}>VAT & Miscodings</h1>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <PrimaryButton iconLeft={<PlayCircleIcon color="white" />} onClick={() => { if (baselineConfigured) onStartVATReview?.(); else setVatModalOpen(true); }}>
-              {vatReviewCompleted ? "Review VAT run" : "Run VAT Review"}
+            <PrimaryButton iconLeft={<PlayCircleIcon color="white" />} onClick={() => onStartVATReview?.()}>
+              "VAT & Miscodings"
             </PrimaryButton>
             {baselineConfigured ? (
               <SecondaryButton style={{ height: 40, padding: "0 14px", fontSize: 14, borderRadius: 8, display: "inline-flex", alignItems: "center", gap: 6 }} onClick={() => onStartClientBaseline?.()}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" stroke="#080908" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 Client baseline
               </SecondaryButton>
-            ) : (
-              <SecondaryButton style={{ height: 40, padding: "0 14px", fontSize: 14, borderRadius: 8 }} onClick={() => onStartVATReview?.()}>
-                Skip configuration
-              </SecondaryButton>
-            )}
+            ) : null}
           </div>
         </div>
       </div>
@@ -20073,7 +21550,7 @@ function VATReviewPage({ onStartClientBaseline, onStartVATReview, baselineConfig
         <div style={{ maxWidth: 1440, margin: "0 auto", display: "flex", flexDirection: "column", gap: 24 }}>
 
           {/* Onboarding banner — client baseline */}
-          {!bannerDismissed && !baselineConfigured && !vatReviewCompleted && (
+          {false && (
           <div style={{ background: "#F7F6F4", borderRadius: 8, padding: 24, display: "flex", alignItems: "center", gap: 24 }}>
             <img src="img/banner-client-config.png" alt="" style={{ width: 260, height: "auto", borderRadius: 8, flexShrink: 0, display: "block" }} />
             <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 8 }}>
@@ -20111,13 +21588,26 @@ function VATReviewPage({ onStartClientBaseline, onStartVATReview, baselineConfig
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
             {/* VAT Review widget */}
             <div style={{ background: "#FFFFFF", border: "1px solid #E9E9EB", borderRadius: 8, padding: "16px 20px", display: "flex", alignItems: "center", gap: 12 }}>
-              <div style={{ width: 40, height: 40, borderRadius: 10, background: vatReviewCompleted ? "#FCEFEC" : "#F5F5F5", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m-6 9 2 2 4-4" stroke={vatReviewCompleted ? "#C8543A" : "#8C8C8B"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              </div>
+              {(() => {
+                const isCompleted = vatReviewCompleted && vatCounts.Priority === 0 && vatCounts.Review === 0;
+                return (
+                  <div style={{ width: 40, height: 40, borderRadius: 10, background: isCompleted ? "#F1F8F0" : vatReviewCompleted ? "#FCEFEC" : "#F5F5F5", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    {isCompleted
+                      ? <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M7.5 12 10.5 15 16.5 9M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" stroke="#05A105" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      : <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m-6 9 2 2 4-4" stroke={vatReviewCompleted ? "#C8543A" : "#8C8C8B"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    }
+                  </div>
+                );
+              })()}
               {!vatReviewCompleted ? (
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 14, color: "#8C8C8B", marginBottom: 2 }}>VAT Review</div>
                   <div style={{ fontSize: 18, fontWeight: 500, color: "#080908" }}>Workflow not initiated</div>
+                </div>
+              ) : vatCounts.Priority === 0 && vatCounts.Review === 0 ? (
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 14, color: "#8C8C8B", marginBottom: 2 }}>VAT Review</div>
+                  <div style={{ fontSize: 18, fontWeight: 500, color: "#080908" }}>Completed</div>
                 </div>
               ) : (
                 <>
@@ -20134,34 +21624,29 @@ function VATReviewPage({ onStartClientBaseline, onStartVATReview, baselineConfig
               )}
             </div>
             <div style={{ background: "#FFFFFF", border: "1px solid #E9E9EB", borderRadius: 8, padding: "16px 20px", display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 8, background: vatReviewCompleted ? "#FCEFEC" : "#F5F5F5", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2M9 12l2 2 4-4" stroke={vatReviewCompleted ? "#C8543A" : "#8C8C8B"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 14, color: "#8C8C8B", marginBottom: 2 }}>{vatReviewCompleted ? "Miscodings" : "Miscoding review"}</div>
+                <div style={{ fontSize: 18, fontWeight: 500, color: "#080908" }}>{vatReviewCompleted ? "4 suggestions" : "Workflow not initiated"}</div>
+              </div>
+            </div>
+            <div style={{ background: "#FFFFFF", border: "1px solid #E9E9EB", borderRadius: 8, padding: "16px 20px", display: "flex", alignItems: "center", gap: 12 }}>
               <div style={{ width: 40, height: 40, borderRadius: 10, background: "#EBF0FB", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M13.9032 10.9219H7.94488M9.93099 14.8941H7.94488M15.8893 6.94965H7.94488M19.8615 10.4253V6.75104C19.8615 5.08255 19.8615 4.24831 19.5368 3.61103C19.2512 3.05046 18.7955 2.59471 18.2349 2.30908C17.5976 1.98438 16.7634 1.98438 15.0949 1.98438H8.73932C7.07083 1.98438 6.23659 1.98438 5.59931 2.30908C5.03874 2.59471 4.58299 3.05046 4.29737 3.61103C3.97266 4.24831 3.97266 5.08255 3.97266 6.75104V17.0788C3.97266 18.7473 3.97266 19.5816 4.29737 20.2188C4.58299 20.7794 5.03874 21.2352 5.59931 21.5208C6.23659 21.8455 7.07083 21.8455 8.73932 21.8455H11.4206M21.8477 21.8455L20.3581 20.3559M21.3511 17.8733C21.3511 19.7928 19.795 21.349 17.8754 21.349C15.9559 21.349 14.3997 19.7928 14.3997 17.8733C14.3997 15.9537 15.9559 14.3976 17.8754 14.3976C19.795 14.3976 21.3511 15.9537 21.3511 17.8733Z" stroke="#4C71DF" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"/></svg>
               </div>
               <>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 14, color: "#8C8C8B", marginBottom: 2 }}>Opening balance</div>
+                  <div style={{ fontSize: 14, color: "#8C8C8B", marginBottom: 2 }}>VAT Opening balance</div>
                   <div style={{ fontSize: 18, fontWeight: 500, color: "#080908" }}>{vatReviewCompleted ? "£43,731.85" : "–"}</div>
                 </div>
                 <div style={{ width: 1, height: 44, background: "#E9E9EB", flexShrink: 0, alignSelf: "center" }} />
                 <div style={{ flex: 1, paddingLeft: 16 }}>
-                  <div style={{ fontSize: 14, color: "#8C8C8B", marginBottom: 2 }}>Closing balance</div>
+                  <div style={{ fontSize: 14, color: "#8C8C8B", marginBottom: 2 }}>VAT Closing balance</div>
                   <div style={{ fontSize: 18, fontWeight: 500, color: "#080908" }}>{vatReviewCompleted ? "£46,845.73" : "–"}</div>
                 </div>
               </>
-            </div>
-            <div style={{ background: "#FFFFFF", border: "1px solid #E9E9EB", borderRadius: 8, padding: "16px 20px", display: "flex", alignItems: "center", gap: 12 }}>
-              <div style={{ width: 40, height: 40, borderRadius: 10, background: "#FDF8EE", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M20 12.5V6.8C20 5.11984 20 4.27976 19.673 3.63803C19.3854 3.07354 18.9265 2.6146 18.362 2.32698C17.7202 2 16.8802 2 15.2 2H8.8C7.11984 2 6.27976 2 5.63803 2.32698C5.07354 2.6146 4.6146 3.07354 4.32698 3.63803C4 4.27976 4 5.11984 4 6.8V17.2C4 18.8802 4 19.7202 4.32698 20.362C4.6146 20.9265 5.07354 21.3854 5.63803 21.673C6.27976 22 7.11984 22 8.8 22H12M14 11H8M10 15H8M16 7H8M14.5 19L16.5 21L21 16.5" stroke="#D5A750" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 14, color: "#8C8C8B", marginBottom: 2 }}>Net VAT due</div>
-                <div style={{ fontSize: 18, fontWeight: 500, color: "#080908" }}>£2,113.88</div>
-              </div>
-              <div style={{ width: 1, height: 44, background: "#E9E9EB", flexShrink: 0, alignSelf: "center" }} />
-              <div style={{ flex: 1, paddingLeft: 16 }}>
-                <div style={{ fontSize: 14, color: "#8C8C8B", marginBottom: 2 }}>Filing deadline</div>
-                <div style={{ fontSize: 18, fontWeight: 500, color: "#080908" }}>7 Aug 2026</div>
-              </div>
             </div>
           </div>
           );
@@ -20171,6 +21656,30 @@ function VATReviewPage({ onStartClientBaseline, onStartVATReview, baselineConfig
             {/* Title row */}
             <div style={{ padding: "12px 16px", borderBottom: "1px solid #E9E9EB", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
               <span style={{ fontSize: 18, fontWeight: 500, color: "#080908" }}>VAT Return</span>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginLeft: "auto" }}>
+              {/* Previous VAT periods dropdown */}
+              <div style={{ position: "relative" }}>
+                <button
+                  onClick={() => setVatPeriodDropOpen(o => !o)}
+                  style={{ height: 40, padding: "0 12px", borderRadius: 8, border: "1px solid #E9E9EB", background: vatPeriodDropOpen ? "#F5F5F5" : "#FFFFFF", cursor: "pointer", fontSize: 14, fontWeight: 500, color: "#080908", display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "'Inter', sans-serif" }}
+                  onMouseEnter={e => { if (!vatPeriodDropOpen) e.currentTarget.style.background = "#F5F5F5"; }}
+                  onMouseLeave={e => { if (!vatPeriodDropOpen) e.currentTarget.style.background = "#FFFFFF"; }}>
+                  Previous VAT periods
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ transition: "transform 0.2s", transform: vatPeriodDropOpen ? "rotate(180deg)" : "rotate(0deg)" }}><path d="M4 6L8 10L12 6" stroke="#080908" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </button>
+                {vatPeriodDropOpen && (
+                  <div style={{ position: "absolute", top: "calc(100% + 6px)", right: 0, background: "#FFFFFF", border: "1px solid #E9E9EB", borderRadius: 12, boxShadow: "0 8px 24px rgba(0,0,0,0.10)", zIndex: 100, minWidth: 220, padding: 6, fontFamily: "'Inter', sans-serif" }}>
+                    {vatPeriodOptions.map(opt => (
+                      <label key={opt} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", cursor: "pointer", borderRadius: 6, background: "transparent" }}
+                        onMouseEnter={e => e.currentTarget.style.background = "#F5F5F5"}
+                        onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                        <input type="radio" name="vatPeriod" value={opt} checked={selectedVatPeriod === opt} onChange={() => { setSelectedVatPeriod(opt); setVatPeriodDropOpen(false); }} style={{ accentColor: "#05A105", width: 16, height: 16, cursor: "pointer" }} />
+                        <span style={{ fontSize: 14, color: "#080908" }}>{opt}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
               <button onClick={handleDownload}
                 style={{
                   height: 40, padding: "0 14px", borderRadius: 8, fontFamily: "'Inter', sans-serif",
@@ -20202,10 +21711,11 @@ function VATReviewPage({ onStartClientBaseline, onStartVATReview, baselineConfig
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ flexShrink: 0 }}>
                       <path d="M17.5 12.5v1.667c0 1.4 0 2.1-.272 2.635a2.5 2.5 0 0 1-1.093 1.092c-.534.273-1.234.273-2.635.273H6.5c-1.4 0-2.1 0-2.635-.273a2.5 2.5 0 0 1-1.093-1.092C2.5 16.267 2.5 15.567 2.5 14.167V12.5M14.167 8.333 10 12.5m0 0L5.833 8.333M10 12.5v-10" stroke="#080908" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
-                    Download report
+                    Export
                   </>
                 )}
               </button>
+              </div>
             </div>
 
             {/* Table */}
@@ -20218,19 +21728,26 @@ function VATReviewPage({ onStartClientBaseline, onStartVATReview, baselineConfig
               {rows.map((r, i) => {
                 const isLast = i === rows.length - 1;
                 const isHi = !!r.highlight;
-                const bg = isHi ? "#F5F5F5" : "#FFFFFF";
+                const rowBg = "#FFFFFF";
+                const valueBg = "#FFFFFF";
                 const txt = isHi ? "#000000" : "#080908";
                 const borderBottom = isLast ? "none" : "1px solid #E9E9EB";
                 const borderRight = "1px solid #E9E9EB";
+                const rowH = 56;
                 return (
                   <React.Fragment key={r.box}>
-                    <div style={{ background: "#F5F5F5", borderBottom, borderRight, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 500, color: "#000000" }}>
+                    {r.section && (
+                      <div style={{ gridColumn: "1 / -1", padding: "0 16px", height: 56, display: "flex", alignItems: "center", background: "#F5F5F5", borderBottom: "1px solid #E9E9EB", fontSize: 13, fontWeight: 600, color: "#080908" }}>
+                        {r.section}
+                      </div>
+                    )}
+                    <div style={{ background: "#F5F5F5", borderBottom, borderRight, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 500, color: "#000000", height: rowH }}>
                       {r.box}
                     </div>
-                    <div style={{ padding: "20px 24px", background: bg, borderBottom, borderRight, fontSize: 14, color: txt, fontWeight: isHi ? 500 : 400, display: "flex", alignItems: "center" }}>
+                    <div style={{ padding: "0 24px", background: rowBg, borderBottom, borderRight, fontSize: 14, color: txt, fontWeight: isHi ? 600 : 400, display: "flex", alignItems: "center", height: rowH }}>
                       {r.label}
                     </div>
-                    <div style={{ padding: "20px 24px", background: bg, borderBottom, fontSize: 14, color: txt, fontWeight: isHi ? 500 : 400, display: "flex", alignItems: "center", justifyContent: "flex-end", whiteSpace: "nowrap" }}>
+                    <div style={{ padding: "0 24px", background: valueBg, borderBottom, fontSize: 14, color: txt, fontWeight: isHi ? 600 : 400, display: "flex", alignItems: "center", justifyContent: "flex-end", whiteSpace: "nowrap", height: rowH }}>
                       {r.value}
                     </div>
                   </React.Fragment>
@@ -20347,6 +21864,10 @@ export default function BankReconciliation() {
   }); // { [accountName]: { fileName, date } }
   const [rowComments, setRowComments] = useState({}); // { [accountCode]: [{user, timestamp, text}] }
   const [vatReviewActive, setVatReviewActive] = useState(false);
+  const [vatReviewV2Active, setVatReviewV2Active] = useState(false);
+  const [vatReviewV2ResolvedCards, setVatReviewV2ResolvedCards] = useState(new Set());
+  const [vatReviewV2IgnoredCards, setVatReviewV2IgnoredCards] = useState(new Set());
+  const [vatReviewV2Completed, setVatReviewV2Completed] = useState(false);
   const [clientBaselineActive, setClientBaselineActive] = useState(false);
   const [clientBaselineResolvedCards, setClientBaselineResolvedCards] = useState(new Set());
   const [clientBaselineIgnoredCards, setClientBaselineIgnoredCards] = useState(new Set());
@@ -20621,6 +22142,10 @@ export default function BankReconciliation() {
     return <VATReviewFlow selectedPeriod={selectedPeriod} onClose={() => { setVatReviewActive(false); setVatReviewCompleted(true); }} resolvedCards={vatResolvedCards} setResolvedCards={setVatResolvedCards} ignoredCards={vatIgnoredCards} setIgnoredCards={setVatIgnoredCards} showResults={vatReviewCompleted} />;
   }
 
+  if (vatReviewV2Active) {
+    return <VATReviewFlowV2 selectedPeriod={selectedPeriod} onClose={() => { setVatReviewV2Active(false); setVatReviewV2Completed(true); }} resolvedCards={vatReviewV2ResolvedCards} setResolvedCards={setVatReviewV2ResolvedCards} ignoredCards={vatReviewV2IgnoredCards} setIgnoredCards={setVatReviewV2IgnoredCards} showResults={vatReviewV2Completed} />;
+  }
+
   if (clientBaselineActive) {
     return <ClientBaselineFlow selectedPeriod={selectedPeriod} onClose={() => {
       setClientBaselineActive(false);
@@ -20696,10 +22221,10 @@ export default function BankReconciliation() {
             <TopBar period={selectedPeriod} onPeriodChange={setSelectedPeriod} onSyncClick={handleSyncAll} syncing={syncing} syncStatus={syncStatus} />
             <CollectDocumentsPage selectedPeriod={selectedPeriod} bankStatements={bankStatements} onUploadStatements={openUploadSidebar} onAllStatements={() => setAllStatementsOpen(true)} />
           </div>
-        ) : activeNav === "VAT Review" ? (
+        ) : activeNav === "VAT & Miscodings" ? (
           <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
             <TopBar period={selectedPeriod} onPeriodChange={setSelectedPeriod} onSyncClick={handleSyncAll} syncing={syncing} syncStatus={syncStatus} />
-            <VATReviewPage onStartClientBaseline={() => setClientBaselineActive(true)} onStartVATReview={() => setVatReviewActive(true)} baselineConfigured={clientBaselineConfigured} configuredDate={clientBaselineConfiguredDate} configuredTime={clientBaselineConfiguredTime} onMarkConfigured={markClientBaselineConfigured} resolvedCards={clientBaselineResolvedCards} ignoredCards={clientBaselineIgnoredCards} vatReviewCompleted={vatReviewCompleted} vatResolvedCards={vatResolvedCards} vatIgnoredCards={vatIgnoredCards} />
+            <VATReviewPage onStartClientBaseline={() => setClientBaselineActive(true)} onStartVATReview={() => setVatReviewActive(true)} onStartVATReviewV2={() => setVatReviewV2Active(true)} selectedPeriod={selectedPeriod} baselineConfigured={clientBaselineConfigured} configuredDate={clientBaselineConfiguredDate} configuredTime={clientBaselineConfiguredTime} onMarkConfigured={markClientBaselineConfigured} resolvedCards={clientBaselineResolvedCards} ignoredCards={clientBaselineIgnoredCards} vatReviewCompleted={vatReviewCompleted} vatResolvedCards={vatResolvedCards} vatIgnoredCards={vatIgnoredCards} />
           </div>
         ) : (
         <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
