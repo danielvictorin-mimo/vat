@@ -3891,9 +3891,10 @@ function VATReviewFlow({
           style: {
             display: "grid",
             gridTemplateColumns: gridTpl,
-            borderBottom: "1px solid #E9E9EB",
+            borderBottom: isSelected ? "1px solid #3D9B6B" : "1px solid #E9E9EB",
+            outline: isSelected ? "1.5px solid #3D9B6B" : "none",
             background: isSelected ? "#F4FBF1" : (effectiveStatus(row) === "Priority" ? "#FDF1F0" : "#FFFFFF"),
-            transition: "background 0.1s",
+            transition: "background 0.1s, outline 0.1s",
             cursor: clickable ? "pointer" : "default"
           },
           onMouseEnter: e => {
