@@ -419,7 +419,7 @@ const VAT_ACCOUNT_TX = [
     rows: [
       { status: "Clear",    date: "15 Apr 2026", source: "Payable Invoice", description: "Hamleys Events Ltd — Event photography service — digital prints package", ref: "HAM-2026-00412",    currency: "GBP", debitSrc: 400.00,   creditSrc: null, debitGbp: 400.00,  creditGbp: null, running: 400.00,  vat: "20% (VAT on Expenses)" },
       { status: "Clear",    date: "4 May 2026",  source: "Payable Invoice", description: "Northstar Marketing Ltd — Brand Strategy & Positioning",                  ref: "NSM-2026-0504-042", currency: "GBP", debitSrc: 2800.00,  creditSrc: null, debitGbp: 2800.00, creditGbp: null, running: 3200.00, vat: "20% (VAT on Expenses)" },
-      { status: "Review",   cardIdx: 5, date: "12 Apr 2026",  source: "Payable Invoice", description: "Adobe Inc",            ref: "NSM-2026-0504-042", currency: "GBP", debitSrc: null,    creditSrc: 1200.00,   debitGbp: null,    creditGbp: 1200.00,   running: 6050.00, vat: "20% (VAT on Expenses)" },
+      { status: "Review", cardIdx: 5, date: "12 Apr 2026", source: "Payable Invoice", description: "Adobe Inc — Creative Cloud subscription (monthly)", ref: "NSM-2026-0504-042-01", currency: "GBP", debitSrc: null, creditSrc: 550.00, debitGbp: null, creditGbp: 550.00, running: null, vat: "Standard 20%" },
       { status: "Clear",    date: "4 May 2026",  source: "Payable Invoice", description: "Northstar Marketing Ltd — Paid Search Campaign Setup (Google Ads)",       ref: "NSM-2026-0504-042", currency: "GBP", debitSrc: 1200.00,  creditSrc: null, debitGbp: 1200.00, creditGbp: null, running: 7250.00, vat: "20% (VAT on Expenses)" },
     ] },
   { account: "Direct Expenses", opening: 0,
@@ -432,8 +432,16 @@ const VAT_ACCOUNT_TX = [
       { status: "Clear",    date: "14 Apr 2026", source: "Payable Invoice", description: "Whitford Mechanical Services Ltd — Annual gas boiler service & safety inspection", ref: "WMS-26-0418",    currency: "GBP", debitSrc: 145.00,    creditSrc: null, debitGbp: 145.00,    creditGbp: null, running: 145.00,    vat: "20% (VAT on Expenses)" },
       { status: "Clear"   ,   cardIdx: 1, date: "15 Apr 2026", source: "Payable Invoice", description: "Hamleys Events Ltd — Hot takeaway sandwich — bacon & egg roll.",                  ref: "HAM-2026-00412", currency: "GBP", debitSrc: 157.50,    creditSrc: null, debitGbp: 157.50,    creditGbp: null, running: 302.50,    vat: "20% (VAT on Expenses)" },
       { status: "Clear"   ,   cardIdx: 2, date: "15 Apr 2026", source: "Payable Invoice", description: "Hamleys Events Ltd — Cold pre-packed sandwich — cheese & pickle",                ref: "HAM-2026-00412", currency: "GBP", debitSrc: 76.00,     creditSrc: null, debitGbp: 76.00,     creditGbp: null, running: 378.50,    vat: "Zero Rated Expenses" },
-      { status: "Review", cardIdx: 6, date: "5 Apr 2026", source: "Payable Invoice", description: "WeWork Ltd — Office space rental miscoded as Travel & Accommodation",                          ref: "5847291",        currency: "GBP", debitSrc: null,    creditSrc: 2400.00,   debitGbp: null,      creditGbp: 2400.00,   running: 4462.22,   vat: "20% (VAT on Expenses)" },
-      { status: "Priority", cardIdx: 1, date: "15 Mar 2026", source: "Payable Invoice", description: "Meridian Consulting Ltd — Professional services coded at 20% (VAT on Expenses); supply may be outside scope, No VAT may apply",        ref: "INV-04829",          currency: "GBP", debitSrc: null,       creditSrc: 380.00,    debitGbp: null,       creditGbp: 380.00,    running: 4850.20, vat: "" },
+      { status: "Review", cardIdx: 6, date: "5 Apr 2026", source: "Payable Invoice", description: "WeWork Ltd — Office space rental (Apr 2026)", ref: "5847291-01", currency: "GBP", debitSrc: null, creditSrc: 912.00, debitGbp: null, creditGbp: 912.00, running: null, vat: "Standard 20%" },
+      { status: "Clear", date: "5 Apr 2026", source: "Payable Invoice", description: "WeWork Ltd — Meeting room hire (Apr 2026)", ref: "5847291-02", currency: "GBP", debitSrc: null, creditSrc: 672.00, debitGbp: null, creditGbp: 672.00, running: null, vat: "Standard 20%" },
+      { status: "Clear", date: "5 Apr 2026", source: "Payable Invoice", description: "WeWork Ltd — Business lounge access", ref: "5847291-03", currency: "GBP", debitSrc: null, creditSrc: 480.00, debitGbp: null, creditGbp: 480.00, running: null, vat: "Standard 20%" },
+      { status: "Clear", date: "5 Apr 2026", source: "Payable Invoice", description: "WeWork Ltd — Printing & consumables", ref: "5847291-04", currency: "GBP", debitSrc: null, creditSrc: 216.00, debitGbp: null, creditGbp: 216.00, running: null, vat: "Standard 20%" },
+      { status: "Clear", date: "5 Apr 2026", source: "Payable Invoice", description: "WeWork Ltd — Service charge & admin fee", ref: "5847291-05", currency: "GBP", debitSrc: null, creditSrc: 120.00, debitGbp: null, creditGbp: 120.00, running: null, vat: "Standard 20%" },
+      { status: "Priority", cardIdx: 1, date: "15 Mar 2026", source: "Payable Invoice", description: "Meridian Consulting Ltd — Professional services, scope of works", ref: "INV-04829-01", currency: "GBP", debitSrc: null, creditSrc: 144.40, debitGbp: null, creditGbp: 144.40, running: null, vat: "20% (VAT on Expenses)" },
+      { status: "Clear", date: "15 Mar 2026", source: "Payable Invoice", description: "Meridian Consulting Ltd — Materials, parts & components supplied", ref: "INV-04829-02", currency: "GBP", debitSrc: null, creditSrc: 106.40, debitGbp: null, creditGbp: 106.40, running: null, vat: "20% (VAT on Expenses)" },
+      { status: "Clear", date: "15 Mar 2026", source: "Payable Invoice", description: "Meridian Consulting Ltd — Engineer labour, on-site attendance", ref: "INV-04829-03", currency: "GBP", debitSrc: null, creditSrc: 76.00, debitGbp: null, creditGbp: 76.00, running: null, vat: "20% (VAT on Expenses)" },
+      { status: "Clear", date: "15 Mar 2026", source: "Payable Invoice", description: "Meridian Consulting Ltd — Sundries, consumables & van stock", ref: "INV-04829-04", currency: "GBP", debitSrc: null, creditSrc: 34.20, debitGbp: null, creditGbp: 34.20, running: null, vat: "20% (VAT on Expenses)" },
+      { status: "Clear", date: "15 Mar 2026", source: "Payable Invoice", description: "Meridian Consulting Ltd — Documentation, certification & sign-off", ref: "INV-04829-05", currency: "GBP", debitSrc: null, creditSrc: 19.00, debitGbp: null, creditGbp: 19.00, running: null, vat: "20% (VAT on Expenses)" },
       { status: "Review", cardIdx: 9, date: "5 Apr 2026", source: "Payable Invoice", description: "Tesco Fuel — Fuel purchase coded at standard 20%; may qualify for reduced rate (5%)",                                   ref: "TESC-2026-04", currency: "GBP", debitSrc: null, creditSrc: 220.00, debitGbp: null, creditGbp: 220.00, running: 3240.00, vat: "20%" },
     ] },
   { account: "Subscriptions", opening: 0,
@@ -467,7 +475,9 @@ const VAT_ACCOUNT_TX = [
     ] },
   { account: "Cost of Goods Sold", opening: 0, rows: [
     { status: "Clear", date: "8 Apr 2026", source: "Payable Invoice", description: "Polychemtex Inc. — Raw materials shipment", ref: "PCX-2026-0408", currency: "GBP", debitSrc: 12500.00, creditSrc: null, debitGbp: 12500.00, creditGbp: null, running: 12500.00, vat: "20% (VAT on Expenses)" },
-    { status: "Review", cardIdx: 8, date: "22 Apr 2026", source: "Payable Invoice", description: "Royal Mail Group — Postage costs miscoded as Marketing & Advertising", ref: "5847410", currency: "GBP", debitSrc: null,   creditSrc: 480.00,   debitGbp: null,    creditGbp: 480.00,   running: 18535.58, vat: "20% (VAT on Expenses)" },
+      { status: "Review", cardIdx: 8, date: "22 Apr 2026", source: "Payable Invoice", description: "Royal Mail Group — First Class Post, batch client mailing (Apr)", ref: "5847410-01", currency: "GBP", debitSrc: null, creditSrc: 120.00, debitGbp: null, creditGbp: 120.00, running: null, vat: "Exempt" },
+      { status: "Review", cardIdx: 8, date: "22 Apr 2026", source: "Payable Invoice", description: "Royal Mail Group — Parcel service, product sample dispatch", ref: "5847410-02", currency: "GBP", debitSrc: null, creditSrc: 175.00, debitGbp: null, creditGbp: 175.00, running: null, vat: "Exempt" },
+      { status: "Review", cardIdx: 8, date: "22 Apr 2026", source: "Payable Invoice", description: "Royal Mail Group — Special Delivery, contract return (signed)", ref: "5847410-03", currency: "GBP", debitSrc: null, creditSrc: 100.00, debitGbp: null, creditGbp: 100.00, running: null, vat: "Exempt" },
     { status: "Clear", date: "29 Apr 2026", source: "Payable Invoice", description: "Outback Logistics Pty Ltd — Inbound freight", ref: "INV-04902", currency: "GBP", debitSrc: 1820.00, creditSrc: null, debitGbp: 965.30, creditGbp: null, running: 19500.88, vat: "Reverse Charge Expenses (20%)" },
   ] },
   { account: "Depreciation Expense", opening: 0, rows: [
@@ -516,7 +526,11 @@ const VAT_ACCOUNT_TX = [
   { account: "Travel - National", opening: 0, rows: [
     { status: "Clear", date: "9 Apr 2026", source: "Expense Claim", description: "Trainline — London-Manchester return", ref: "TL-2026-0409", currency: "GBP", debitSrc: 184.50, creditSrc: null, debitGbp: 184.50, creditGbp: null, running: 184.50, vat: "Zero Rated Expenses" },
   
-      { status: "Priority",   cardIdx: 12, date: "22 Apr 2026",  source: "Payable Invoice", description: "DHL / HMRC Customs — Import customs charge; likely relates to postponed VAT accounting (PVA), reconcile against monthly PVA statementices",          ref: "NSM-2026-0504-042",  currency: "GBP", debitSrc: null,       creditSrc: 475.00,     debitGbp: null,       creditGbp: 475.00,     running: 5215.19, vat: "" },
+      { status: "Clear", date: "22 Apr 2026", source: "Payable Invoice", description: "DHL / HMRC Customs — International freight & logistics services", ref: "GH-2026-0417-01", currency: "GBP", debitSrc: null, creditSrc: 199.50, debitGbp: null, creditGbp: 199.50, running: null, vat: "20% (VAT on Expenses)" },
+      { status: "Clear", date: "22 Apr 2026", source: "Payable Invoice", description: "DHL / HMRC Customs — Customs brokerage & trade documentation", ref: "GH-2026-0417-02", currency: "GBP", debitSrc: null, creditSrc: 104.50, debitGbp: null, creditGbp: 104.50, running: null, vat: "20% (VAT on Expenses)" },
+      { status: "Clear", date: "22 Apr 2026", source: "Payable Invoice", description: "DHL / HMRC Customs — Cargo insurance premium", ref: "GH-2026-0417-03", currency: "GBP", debitSrc: null, creditSrc: 76.00, debitGbp: null, creditGbp: 76.00, running: null, vat: "20% (VAT on Expenses)" },
+      { status: "Priority", cardIdx: 12, date: "22 Apr 2026", source: "Payable Invoice", description: "DHL / HMRC Customs — Warehousing, handling & storage", ref: "GH-2026-0417-04", currency: "GBP", debitSrc: null, creditSrc: 57.00, debitGbp: null, creditGbp: 57.00, running: null, vat: "No VAT" },
+      { status: "Clear", date: "22 Apr 2026", source: "Payable Invoice", description: "DHL / HMRC Customs — Last-mile delivery to final destination", ref: "GH-2026-0417-05", currency: "GBP", debitSrc: null, creditSrc: 38.00, debitGbp: null, creditGbp: 38.00, running: null, vat: "20% (VAT on Expenses)" },
     ] },
   { account: "VAT", opening: 0, rows: [
     { status: "Clear", date: "30 Apr 2026", source: "Manual Journal", description: "VAT control — April return", ref: "VAT-04-26", currency: "GBP", debitSrc: null, creditSrc: 2113.88, debitGbp: null, creditGbp: 2113.88, running: 2113.88, vat: "No VAT" },
@@ -1121,7 +1135,7 @@ function VATReviewFlow({
     { key: "revaluedFxRate", label: "Revalued FX Rate",      group: "Foreign exchange (FX)" },
     { key: "vatSrc",         label: "VAT (Source)",          group: "Foreign exchange (FX)" },
   ];
-  const DEFAULT_COLS = new Set(["accountCode","_contact","creditGbp","date","debitGbp","description","ref","running","source","creditSrc","currency","debitSrc"]);
+  const DEFAULT_COLS = new Set(["accountCode","_contact","creditGbp","date","debitGbp","description","ref","vat","source","creditSrc","currency","debitSrc"]);
   const [visibleCols, setVisibleCols] = useState(new Set(DEFAULT_COLS));
   const [colsFilterOpen, setColsFilterOpen] = useState(false);
   const colsFilterBtnRef = useRef(null);
@@ -3681,7 +3695,7 @@ cardVisible && VAT_QUESTIONS[vatAnswers.length] && /*#__PURE__*/React.createElem
     }, {
       key: "vat",
       label: "VAT Rate Name",
-      width: "180px"
+      width: "220px"
     }, {
       key: "accountCode",    label: "Account Code",          width: "240px"
     }, {
@@ -4766,6 +4780,13 @@ function ProfitVATChart() {
   const [hoveredMonth, setHoveredMonth] = React.useState(null);
   const [selectedPeriod, setSelectedPeriod] = React.useState("12 months");
   const [dropOpen, setDropOpen] = React.useState(false);
+  const dropRef = React.useRef(null);
+  React.useEffect(() => {
+    if (!dropOpen) return;
+    const h = e => { if (dropRef.current && !dropRef.current.contains(e.target)) setDropOpen(false); };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, [dropOpen]);
   // 24 months ending June 2026: Jul 2024 → Jun 2026
   const allMonths24 = ["Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar","Apr","May","Jun"];
   const fullMonths24 = ["July","August","September","October","November","December","January","February","March","April","May","June","July","August","September","October","November","December","January","February","March","April","May","June"];
@@ -4821,8 +4842,8 @@ function ProfitVATChart() {
         React.createElement("div",{style:{fontSize:14,color:"#8C8C8B"}},"Accounting period · Jan – Dec 2026")
       ),
       React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},
-                        React.createElement("div",{style:{position:"relative"}},
-        React.createElement("button",{onClick:()=>setDropOpen(o=>!o),style:{display:"flex",alignItems:"center",gap:6,height:40,padding:"0 14px",border:"1px solid #E9E9EB",borderRadius:8,background:"#FFFFFF",cursor:"pointer",fontSize:14,fontWeight:500,color:"#080908"}},
+                        React.createElement("div",{ref:dropRef,style:{position:"relative"}},
+        React.createElement("button",{onClick:()=>setDropOpen(o=>!o),onMouseEnter:e=>{e.currentTarget.style.borderColor="#CFCFD1";e.currentTarget.style.background="#FAFAFA";},onMouseLeave:e=>{e.currentTarget.style.borderColor="#E9E9EB";e.currentTarget.style.background="#FFFFFF";},style:{display:"flex",alignItems:"center",gap:6,height:40,padding:"0 14px",border:"1px solid #E9E9EB",borderRadius:8,background:"#FFFFFF",cursor:"pointer",fontSize:14,fontWeight:500,color:"#080908"}},
           selectedPeriod,
           React.createElement("svg",{width:12,height:12,viewBox:"0 0 24 24",fill:"none"},React.createElement("path",{d:"M6 9l6 6 6-6",stroke:"#545453",strokeWidth:"1.75",strokeLinecap:"round",strokeLinejoin:"round"}))
         ),
