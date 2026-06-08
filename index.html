@@ -530,10 +530,10 @@ const VAT_CARDS=[{idx:1,cat:"wrong-code",score:null,title:"Meridian Consulting L
 {idx:12,cat:"uncertain",score:null,title:"DHL / HMRC Customs: No VAT → Tax on Purchases (20%) (PVA)",contact:"DHL / HMRC Customs",description:"Client imports goods from non-UK suppliers regularly — the £3,800 Customs charge from HMRC on this DHL consignment likely relates to postponed VAT accounting and should be reconciled against the monthly PVA statement.",tableRow:{"Contact":"DHL / HMRC Customs","Expense account":"760 – Subscriptions & Software","Date":"22 Apr 2026","Amount":"£475.00","VAT rate name":{text:"No VAT",strikethrough:true},"Suggested":"Tax on Purchases (20%) (PVA)"},primaryLabel:"Accept",secondaryLabel:"Review"},{idx:2,cat:"reverse-charge",score:null,title:"Brightside Electrical Ltd: Tax on Purchases (20%) → Reverse Charge (20%)",contact:"Brightside Electrical Ltd",description:"Scanned invoice from Brightside Electrical Ltd shows 'Domestic Reverse Charge applies – do not pay VAT to supplier' in the payment terms, indicating a CIS subcontractor supply.",tableRow:{"Contact":"Brightside Electrical Ltd","Expense account":"310 – Subcontractor Costs","Date":"17 Mar 2026","Amount":"£240.00","VAT rate name":{text:"Tax on Purchases (20%)",strikethrough:true},"Suggested":"Reverse Charge (20%)"},primaryLabel:"Accept",secondaryLabel:"Review",tertiaryLabel:"Edit"},{idx:9,cat:"wrong-code",score:null,title:"Tesco Fuel: 20% (VAT on Expenses) → Reduced Rate (5%)",contact:"Tesco Fuel",description:"This fuel transaction has been coded at the standard 20% VAT rate. Based on the nature of the purchase and supplier, a reduced rate of 5% may apply. Please verify the invoice.",tableRow:{"Contact":"Tesco Fuel","Expense account":"530 – Motor Expenses","Date":"5 Apr 2026","Amount":"£220.00","VAT rate name":{text:"20% (VAT on Expenses)",strikethrough:true},"Suggested":"Reduced Rate (5%)"},primaryLabel:"Accept",secondaryLabel:"Review"},
 {idx:4,cat:"pva",score:null,title:"DHL / HMRC Customs: No VAT → Tax on Purchases (20%) (PVA)",contact:"DHL / HMRC Customs",description:"Client imports goods from non-UK suppliers regularly — the £3,600 Customs charge from HMRC on this DHL consignment likely relates to postponed VAT accounting and should be reconciled against the monthly PVA statement.",tableRow:{"Contact":"DHL / HMRC Customs","Expense account":"510 – Import Duties","Date":"3 Mar 2026","Amount":"£3,600.00","VAT rate name":{text:"No VAT",strikethrough:true},"Suggested":"Tax on Purchases (20%) (PVA)"},primaryLabel:"Accept",secondaryLabel:"Review"},
 {idx:10,cat:"non-reclaimable",score:null,title:"Virgin Trains: Mixed Use — Partial VAT Recovery",contact:"Virgin Trains",description:"This travel invoice includes both business and personal journey legs. VAT recovery should be restricted to the business portion only. Please confirm the split before accepting.",tableRow:{"Contact":"Virgin Trains","Expense account":"420 – Travel & Accommodation","Date":"11 Apr 2026","Amount":"£890.00","VAT rate name":{text:"20% (VAT on Expenses)",strikethrough:true},"Suggested":"Tax Exempt (partial)"},primaryLabel:"Accept",secondaryLabel:"Review"},
-{idx:5,cat:"miscoding",score:null,title:"Adobe Inc: Miscoded as Direct Expenses",contact:"Adobe Inc",description:"This transaction has been coded to '640 – Direct Expenses' but based on the nature of the supplier and transaction, it should be coded to '760 – Subscriptions & Software'. This affects your expense categorisation and P&L reporting.",tableRow:{"Contact":"Adobe Inc","Date":"12 Apr 2026","Amount":"£1,200.00","VAT rate name":"Standard 20%","Expense account":{text:"640 – Direct Expenses",strikethrough:true},"Suggested":"760 – Subscriptions & Software"},primaryLabel:"Accept",secondaryLabel:"Review",tertiaryLabel:"Edit"},
+{idx:8,cat:"miscoding",score:null,title:"Royal Mail Group: Miscoded as Marketing",contact:"Royal Mail Group",description:"This transaction has been coded to '680 – Marketing & Advertising' but should be coded to '650 – Postage & Courier'. Postage costs should be recorded separately from marketing expenditure for accurate reporting.",tableRow:{"Contact":"Royal Mail Group","Date":"22 Apr 2026","Amount":"£480.00","VAT rate name":"Exempt","Expense account":{text:"680 – Marketing & Advertising",strikethrough:true},"Suggested":"650 – Postage & Courier"},lineItems:[{description:"First Class Post — batch client mailing (Apr)",current:"680 – Marketing & Advertising",suggested:"650 – Postage & Courier",amount:"£120.00"},{description:"Parcel service — product sample dispatch",current:"680 – Marketing & Advertising",suggested:"650 – Postage & Courier",amount:"£175.00"},{description:"Special Delivery — contract return (signed)",current:"680 – Marketing & Advertising",suggested:"650 – Postage & Courier",amount:"£100.00"}],primaryLabel:"Accept suggestions",secondaryLabel:"Review",tertiaryLabel:"Edit"},{idx:5,cat:"miscoding",score:null,title:"Adobe Inc: Miscoded as Direct Expenses",contact:"Adobe Inc",description:"This transaction has been coded to '640 – Direct Expenses' but based on the nature of the supplier and transaction, it should be coded to '760 – Subscriptions & Software'. This affects your expense categorisation and P&L reporting.",tableRow:{"Contact":"Adobe Inc","Date":"12 Apr 2026","Amount":"£1,200.00","VAT rate name":"Standard 20%","Expense account":{text:"640 – Direct Expenses",strikethrough:true},"Suggested":"760 – Subscriptions & Software"},primaryLabel:"Accept",secondaryLabel:"Review",tertiaryLabel:"Edit"},
 {idx:6,cat:"miscoding",score:null,title:"WeWork Ltd: Miscoded as Travel Expenses",contact:"WeWork Ltd",description:"This transaction has been coded to '620 – Travel & Accommodation' but should be coded to '720 – Rent & Premises Costs'. Office space rental should not be classified as travel expenditure.",tableRow:{"Contact":"WeWork Ltd","Date":"5 Apr 2026","Amount":"£2,400.00","VAT rate name":"Standard 20%","Expense account":{text:"620 – Travel & Accommodation",strikethrough:true},"Suggested":"720 – Rent & Premises Costs"},primaryLabel:"Accept",secondaryLabel:"Review",tertiaryLabel:"Edit"},
 {idx:7,cat:"miscoding",score:null,title:"Slack Technologies: Miscoded as IT Equipment",contact:"Slack Technologies",description:"This transaction has been coded to '710 – IT Equipment' but should be coded to '760 – Subscriptions & Software'. SaaS subscriptions are not capital expenditure and should not be treated as equipment purchases.",tableRow:{"Contact":"Slack Technologies","Date":"18 Apr 2026","Amount":"£840.00","VAT rate name":"Standard 20%","Expense account":{text:"710 – IT Equipment",strikethrough:true},"Suggested":"760 – Subscriptions & Software"},primaryLabel:"Accept",secondaryLabel:"Review",tertiaryLabel:"Edit"},
-{idx:8,cat:"miscoding",score:null,title:"Royal Mail Group: Miscoded as Marketing",contact:"Royal Mail Group",description:"This transaction has been coded to '680 – Marketing & Advertising' but should be coded to '650 – Postage & Courier'. Postage costs should be recorded separately from marketing expenditure for accurate reporting.",tableRow:{"Contact":"Royal Mail Group","Date":"22 Apr 2026","Amount":"£480.00","VAT rate name":"Exempt","Expense account":{text:"680 – Marketing & Advertising",strikethrough:true},"Suggested":"650 – Postage & Courier"},lineItems:[{description:"First Class Post — batch client mailing (Apr)",current:"680 – Marketing & Advertising",suggested:"650 – Postage & Courier",amount:"£120.00"},{description:"Parcel service — product sample dispatch",current:"680 – Marketing & Advertising",suggested:"650 – Postage & Courier",amount:"£175.00"},{description:"Special Delivery — contract return (signed)",current:"680 – Marketing & Advertising",suggested:"650 – Postage & Courier",amount:"£100.00"}],primaryLabel:"Accept suggestions",secondaryLabel:"Review",tertiaryLabel:"Edit"}];
+];
 function VATReturnCard({
   onReviewReport,
   showingReport = false,
@@ -4692,6 +4692,7 @@ function VATReviewPage({
   // ── Data constants (edit these to tweak content) ─────────────────────────
   const VAT_PERIOD_OPTIONS = ["Apr 2026 (Current)", "Mar 2026", "Feb 2026", "Jan 2026", "Dec 2025", "Nov 2025", "Oct 2025"];
   const [selectedVatPeriod, setSelectedVatPeriod] = useState(VAT_PERIOD_OPTIONS[0]);
+  const vatResolvedCount = vatResolvedCards.size + vatIgnoredCards.size;
   const empty = vatReviewCompleted ? null : "–";
   const isPreviousPeriod = selectedVatPeriod !== VAT_PERIOD_OPTIONS[0];
   const HISTORICAL_DATA = {
@@ -5148,40 +5149,11 @@ function VATReviewPage({
       alignItems: "center",
       gap: 12
     }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      width: 40,
-      height: 40,
-      borderRadius: 10,
-      background: (vatReviewIsClear || isPreviousPeriod) ? "#F1F8F0" : vatReviewCompleted ? "#FCEFEC" : "#F5F5F5",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      flexShrink: 0
-    }
-  }, (vatReviewIsClear || isPreviousPeriod) ? /*#__PURE__*/React.createElement("svg", {
-    width: "24",
-    height: "24",
-    viewBox: "0 0 24 24",
-    fill: "none"
-  }, /*#__PURE__*/React.createElement("path", {
-    d: "M7.5 12 10.5 15 16.5 9M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z",
-    stroke: "#05A105",
-    strokeWidth: "1.5",
-    strokeLinecap: "round",
-    strokeLinejoin: "round"
-  })) : /*#__PURE__*/React.createElement("svg", {
-    width: "24",
-    height: "24",
-    viewBox: "0 0 24 24",
-    fill: "none"
-  }, /*#__PURE__*/React.createElement("path", {
-    d: "M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m-6 9 2 2 4-4",
-    stroke: vatReviewCompleted ? "#C8543A" : "#8C8C8B",
-    strokeWidth: "1.5",
-    strokeLinecap: "round",
-    strokeLinejoin: "round"
-  }))), (!vatReviewCompleted && !isPreviousPeriod) ? /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement(ProgressRing, {
+    progress: (vatReviewIsClear || isPreviousPeriod) ? 100 : Math.round(vatResolvedCount / VAT_CARDS.length * 100),
+    size: 40,
+    strokeWidth: 3
+  }), (!vatReviewCompleted && !isPreviousPeriod) ? /*#__PURE__*/React.createElement("div", {
     style: {
       flex: 1,
       minWidth: 0
@@ -5226,13 +5198,13 @@ function VATReviewPage({
       color: "#8C8C8B",
       marginBottom: 2
     }
-  }, "Critical"), /*#__PURE__*/React.createElement("div", {
+  }, "Critical suggestion"), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 18,
       fontWeight: 500,
       color: "#080908"
     }
-  }, vatCounts.Priority, " suggestions")), /*#__PURE__*/React.createElement("div", {
+  }, Math.min(vatResolvedCount,4)+" of 4 resolved")), /*#__PURE__*/React.createElement("div", {
     style: {
       width: 1,
       height: 44,
@@ -5257,7 +5229,7 @@ function VATReviewPage({
       fontWeight: 500,
       color: "#080908"
     }
-  }, vatCounts.Review, " suggestions")))), /*#__PURE__*/React.createElement("div", {
+  }, Math.max(0,vatResolvedCount-4)+" of 6 resolved")))), /*#__PURE__*/React.createElement("div", {
     style: {
       background: "#FFFFFF",
       border: "1px solid #E9E9EB",
