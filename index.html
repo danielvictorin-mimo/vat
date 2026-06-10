@@ -7554,9 +7554,9 @@ function VATReviewPage({
         tab === "Suggestions" && v2Done && /*#__PURE__*/React.createElement("span", { style: { minWidth: 20, height: 20, padding: "0 5px", borderRadius: 8, background: "#05A105", color: "#FFFFFF", fontSize: 12, fontWeight: 500, lineHeight: 1, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 } }, v2TotalSuggestions),
         active && /*#__PURE__*/React.createElement("div", { style: { position: "absolute", bottom: -1, left: 0, right: 0, height: 2, background: "#05A105" } }));
     }));
-  const v2EmptyCard = (title, sub) => /*#__PURE__*/React.createElement("div", { style: { background: "#FFFFFF", border: "1px solid #ECECEC", borderRadius: 12, padding: 24, minHeight: 280, display: "flex", flexDirection: "column", gap: 16, alignItems: "center", justifyContent: "center" } },
+  const v2EmptyCard = (title, sub, iconPath) => /*#__PURE__*/React.createElement("div", { style: { background: "#FFFFFF", border: "1px solid #ECECEC", borderRadius: 12, padding: 24, minHeight: 280, display: "flex", flexDirection: "column", gap: 16, alignItems: "center", justifyContent: "center" } },
     /*#__PURE__*/React.createElement("svg", { width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", style: { flexShrink: 0 } },
-      /*#__PURE__*/React.createElement("path", { d: "M14 11H8M10 15H8M16 7H8M20 10.5V6.8C20 5.11984 20 4.27976 19.673 3.63803C19.3854 3.07354 18.9265 2.6146 18.362 2.32698C17.7202 2 16.8802 2 15.2 2H8.8C7.11984 2 6.27976 2 5.63803 2.32698C5.07354 2.6146 4.6146 3.07354 4.32698 3.63803C4 4.27976 4 5.11984 4 6.8V17.2C4 18.8802 4 19.7202 4.32698 20.362C4.6146 20.9265 5.07354 21.3854 5.63803 21.673C6.27976 22 7.11984 22 8.8 22H11.5M22 22L20.5 20.5M21.5 18C21.5 19.933 19.933 21.5 18 21.5C16.067 21.5 14.5 19.933 14.5 18C14.5 16.067 16.067 14.5 18 14.5C19.933 14.5 21.5 16.067 21.5 18Z", stroke: "#7C7C7C", strokeWidth: 1.25, strokeLinecap: "round", strokeLinejoin: "round" })),
+      /*#__PURE__*/React.createElement("path", { d: iconPath || "M14 11H8M10 15H8M16 7H8M20 10.5V6.8C20 5.11984 20 4.27976 19.673 3.63803C19.3854 3.07354 18.9265 2.6146 18.362 2.32698C17.7202 2 16.8802 2 15.2 2H8.8C7.11984 2 6.27976 2 5.63803 2.32698C5.07354 2.6146 4.6146 3.07354 4.32698 3.63803C4 4.27976 4 5.11984 4 6.8V17.2C4 18.8802 4 19.7202 4.32698 20.362C4.6146 20.9265 5.07354 21.3854 5.63803 21.673C6.27976 22 7.11984 22 8.8 22H11.5M22 22L20.5 20.5M21.5 18C21.5 19.933 19.933 21.5 18 21.5C16.067 21.5 14.5 19.933 14.5 18C14.5 16.067 16.067 14.5 18 14.5C19.933 14.5 21.5 16.067 21.5 18Z", stroke: "#7C7C7C", strokeWidth: 1.25, strokeLinecap: "round", strokeLinejoin: "round" })),
     /*#__PURE__*/React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 4, textAlign: "center" } },
       /*#__PURE__*/React.createElement("div", { style: { fontSize: 14, lineHeight: "22px", letterSpacing: "0.15px", fontWeight: 500, color: "#2A2A2A" } }, title),
       /*#__PURE__*/React.createElement("div", { style: { fontSize: 14, lineHeight: "22px", letterSpacing: "0.15px", fontWeight: 400, color: "#7C7C7C" } }, sub)));
@@ -7721,7 +7721,8 @@ function VATReviewPage({
       !v2RunCompleted ? v2GroupEmpty :
       !v2Ready ? v2CanvasLoading :
       v2GroupCards.length ? v2SuggestionsList : v2GroupEmpty) :
-    activeVatTab === "VAT Return" ? vatReturnTable : /*#__PURE__*/React.createElement(ProfitVATChart, null),
+    activeVatTab === "VAT Return" ? vatReturnTable :
+    v2HeaderRunsVisible ? /*#__PURE__*/React.createElement(ProfitVATChart, null) : v2EmptyCard("No costs & revenue data", "Run a bookkeeping review to see costs and revenue insights", "M21 21H4.6C4.03995 21 3.75992 21 3.54601 20.891C3.35785 20.7951 3.20487 20.6422 3.10899 20.454C3 20.2401 3 19.9601 3 19.4V3M20 8L16.0811 12.1827C15.9326 12.3412 15.8584 12.4204 15.7688 12.4614C15.6897 12.4976 15.6026 12.5125 15.516 12.5047C15.4179 12.4958 15.3215 12.4458 15.1287 12.3457L11.8713 10.6543C11.6785 10.5542 11.5821 10.5042 11.484 10.4953C11.3974 10.4875 11.3103 10.5024 11.2312 10.5386C11.1416 10.5796 11.0674 10.6588 10.9189 10.8173L7 15"),
     v2PreviewPanel);
 
   return /*#__PURE__*/React.createElement(React.Fragment, null, reviewSidebar, setupModal, /*#__PURE__*/React.createElement("div", {
