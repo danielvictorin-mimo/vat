@@ -5156,7 +5156,17 @@ function MiniCalendar({ value, onChange, placeholder, autoOpen }) {
 
 const ALL_ACCOUNT_NAMES = ["Accounts Payable", "Accruals", "Advertising & Marketing", "Audit & Accountancy fees", "Bank Fees", "Cleaning", "Consulting", "Cost of Goods Sold", "Depreciation Expense", "Direct Expenses", "Direct Wages", "General Expenses", "IT Software and Consumables", "Legal Expenses", "Light, Power, Heating", "Pensions Costs", "Postage, Freight & Courier", "Prepayments", "Printing & Stationery", "Repairs & Maintenance", "Salaries", "Staff Training", "Subscriptions", "Tracking Transfers", "Travel - National", "VAT"];
 
-function VATAccountTransactionsTable({resolvedCards, resolvedRowKeys, setResolvedRowKeys, ignoredCards, selectedRow, setSelectedRow, externalSearch="", reviewCompleted=false}) {
+function VATAccountTransactionsTable({resolvedCards, resolvedRowKeys, setResolvedRowKeys, ignoredCards, selectedRow, setSelectedRow, externalSearch="", reviewCompleted=false, cards=VAT_CARDS, onOpenCard=null, activeGroup="VAT issues"}) {
+  const CARD_ROWS = (cards || []).map((c, ci) => {
+    const tr = c.tableRow || {};
+    const amt = parseFloat(String(tr["Amount"] || "0").replace(/[\u00a3,]/g, "")) || 0;
+    const marked = activeGroup === "Miscodings" ? c.cat === "miscoding" : c.cat !== "miscoding";
+    return { status: marked ? ([1, 12, 101, 104].includes(c.idx) ? "Priority" : "Review") : "Clear", date: tr["Date"] || "", source: "Payable Invoice",
+      description: c.contact + (c.invoiceLineDesc ? " \u2014 " + c.invoiceLineDesc : ""), ref: "INV-" + (2600 + c.idx), currency: "GBP",
+      debitSrc: null, creditSrc: amt, debitGbp: null, creditGbp: amt, running: null,
+      vat: (typeof tr["VAT rate name"] === "object" && tr["VAT rate name"] ? tr["VAT rate name"].text : tr["VAT rate name"]) || "",
+      cardIdx: c.idx, _section: ci % 2 ? "Advertising & Marketing" : "General Expenses" };
+  });
   const [statusFilterSet, setStatusFilterSet] = useState(new Set());
   const [statusFilterOpen, setStatusFilterOpen] = useState(false);
   const statusFilterBtnRef = useRef(null);
@@ -5208,7 +5218,8 @@ function VATAccountTransactionsTable({resolvedCards, resolvedRowKeys, setResolve
     return () => document.removeEventListener("mousedown", h);
   }, [accountFilterOpen, colsFilterOpen, groupByDropOpen]);
   const _allFlatRows = [];
-  VAT_ACCOUNT_TX.forEach(sec => sec.rows.filter(r => reviewCompleted ? true : (r.status === "Clear" || !r.cardIdx)).forEach(r => _allFlatRows.push({...r, _section: sec.account})));
+  VAT_ACCOUNT_TX.filter(sec => sec.account !== "Accounts Payable" && sec.account !== "Accruals").forEach(sec => sec.rows.filter(r => !r.cardIdx).forEach(r => _allFlatRows.push({...r, _section: sec.account})));
+  if (reviewCompleted) CARD_ROWS.forEach(r => _allFlatRows.push(r));
   // Sort: Priority first, then Review, then Clear
   const _STATUS_SORT = {Priority:0,Review:1,Clear:2};
   _allFlatRows.sort((a,b) => (_STATUS_SORT[a.status]??3) - (_STATUS_SORT[b.status]??3));
@@ -5586,11 +5597,17 @@ function VATAccountTransactionsTable({resolvedCards, resolvedRowKeys, setResolve
     ),
     (() => {
     const _allFlat = [];
-    VAT_ACCOUNT_TX.forEach(sec => sec.rows.filter(r => reviewCompleted ? true : (r.status === "Clear" || !r.cardIdx)).forEach(r => _allFlat.push({...r, _section: sec.account})));
-    const TX_TOTAL = _allFlat.length;
+    VAT_ACCOUNT_TX.filter(sec => sec.account !== "Accounts Payable" && sec.account !== "Accruals").forEach(sec => sec.rows.filter(r => !r.cardIdx).forEach(r => _allFlat.push({...r, _section: sec.account})));
+    if (reviewCompleted) CARD_ROWS.forEach(r => _allFlat.push(r));
+    const _SORT_RANK = { Priority: 0, Review: 1, Clear: 2 };
+    let _flat = _allFlat;
+    if (statusFilterSet.size > 0) _flat = _flat.filter(r => statusFilterSet.has(r.status));
+    if (externalSearch) _flat = _flat.filter(r => (r.description || "").toLowerCase().includes(externalSearch.toLowerCase()) || (r._section || "").toLowerCase().includes(externalSearch.toLowerCase()) || (r.vat || "").toLowerCase().includes(externalSearch.toLowerCase()));
+    _flat.sort((a, b) => (_SORT_RANK[a.status] ?? 3) - (_SORT_RANK[b.status] ?? 3));
+    const TX_TOTAL = _flat.length;
     const TX_TOTAL_PAGES = Math.max(1, Math.ceil(TX_TOTAL / txPageSize));
     const TX_SAFE_PAGE = Math.min(txPage, TX_TOTAL_PAGES);
-    const TX_PAGED = _allFlat.slice((TX_SAFE_PAGE-1)*txPageSize, TX_SAFE_PAGE*txPageSize);
+    const TX_PAGED = _flat.slice((TX_SAFE_PAGE-1)*txPageSize, TX_SAFE_PAGE*txPageSize);
     const _paged = {}; TX_PAGED.forEach(r => { if(!_paged[r._section])_paged[r._section]=[]; _paged[r._section].push(r); });
     const ACCOUNT_TX = VAT_ACCOUNT_TX.map(sec => ({...sec, rows: _paged[sec.account]||[]})).filter(s=>s.rows.length>0);
     const STATUS_STYLES = {
@@ -5960,6 +5977,7 @@ function VATAccountTransactionsTable({resolvedCards, resolvedRowKeys, setResolve
           "data-rowkey": rowKey,
           onClick: () => {
             if (!clickable) return;
+            if (onOpenCard && (row.status === "Priority" || row.status === "Review")) { onOpenCard(row.cardIdx); return; }
             if (isSelected) {
               setSelectedRow(null);
               return;
@@ -6011,7 +6029,7 @@ function VATAccountTransactionsTable({resolvedCards, resolvedRowKeys, setResolve
           if (isStatus && (resolvedRowKeys.has(rowKey) || row.cardIdx != null && (resolvedCards.has(row.cardIdx) || ignoredCards.has(row.cardIdx)))) {
             v = "Clear";
           }
-          const isMiscodingRow = v === "Priority" && row.cardIdx != null && (VAT_CARDS.find(c => c.idx === row.cardIdx) || {}).cat === "miscoding";
+          const isMiscodingRow = v === "Priority" && row.cardIdx != null && ((cards || VAT_CARDS).find(c => c.idx === row.cardIdx) || {}).cat === "miscoding";
           const origStatus = row.status;
           const dispStatus = origStatus;
           const st = isStatus && dispStatus ? (isMiscodingRow ? { background: "#FDF8EE", color: "#D5A750" } : STATUS_STYLES[dispStatus]) : null;
@@ -6044,7 +6062,7 @@ function VATAccountTransactionsTable({resolvedCards, resolvedRowKeys, setResolve
               color: st.color,
               whiteSpace: "nowrap"
             }
-          }, dispStatus==="Priority"?(((VAT_CARDS.find(c=>c.idx===row.cardIdx)||{}).cat==="miscoding")?"Attention miscoding":"Critical VAT"):dispStatus==="Review"?(((VAT_CARDS.find(c=>c.idx===row.cardIdx)||{}).cat==="miscoding")?"Attention miscoding":"Attention VAT"):dispStatus==="Clear"?(reviewCompleted?"Clear":"Pending review"):dispStatus)) : col.key === "description"
+          }, dispStatus==="Priority"?"Critical":dispStatus==="Review"?"Attention":dispStatus==="Clear"?(reviewCompleted?"Clear":"Pending review"):dispStatus)) : col.key === "description"
             ? (() => {
                 const descVal = (col.render ? col.render(row[col.key], row) : row[col.key]) || "-";
                 return /*#__PURE__*/React.createElement("div", {
@@ -6067,7 +6085,7 @@ function VATAccountTransactionsTable({resolvedCards, resolvedRowKeys, setResolve
                   }
                 }, descVal);
               })()
-            : v==="Priority"?(((VAT_CARDS.find(c=>c.idx===row.cardIdx)||{}).cat==="miscoding")?"Attention miscoding":"Critical VAT"):v==="Review"?(((VAT_CARDS.find(c=>c.idx===row.cardIdx)||{}).cat==="miscoding")?"Attention miscoding":"Attention VAT"):({Clear:"Clear"})[v]||v||"-");
+            : v==="Priority"?"Critical":v==="Review"?"Attention":({Clear:"Clear"})[v]||v||"-");
         }));
       }), (() => {
         const totals = section.rows.reduce((acc, r) => ({
@@ -7566,7 +7584,7 @@ function VATReviewPage({
       ? (v2Group === "VAT issues" ? "All VAT issues have been resolved" : "All miscodings have been resolved")
       : (v2Group === "VAT issues" ? "Run a bookkeeping review to check for VAT issues" : "Run a bookkeeping review to check for miscodings"));
   // ── Sub-render (v2): suggestion cards (post-review, per Figma 2721:70174) ──
-  const v2Severity = idx => [1, 12, 101, 104].includes(idx) ? { label: "Critical", bg: "#FCEFEC", color: "#C8543A" } : { label: "Review", bg: "#FDF8EE", color: "#D5A750" };
+  const v2Severity = idx => [1, 12, 101, 104].includes(idx) ? { label: "Critical", bg: "#FCEFEC", color: "#C8543A" } : { label: "Attention", bg: "#FDF8EE", color: "#D5A750" };
   const v2CardRows = card => {
     const tr = card.tableRow || {};
     const isMisc = card.cat === "miscoding";
@@ -7713,7 +7731,7 @@ function VATReviewPage({
       onDelete: () => setV2PreviewCard(null), onArchive: () => setV2PreviewCard(null), onKeep: () => setV2PreviewCard(null)
     });
   })();
-  const accountTransactionsBlock = /*#__PURE__*/React.createElement("div",{style:{border:"1px solid #E9E9EB",borderRadius:8,overflow:"visible",display:"flex",flexDirection:"column"}},/*#__PURE__*/React.createElement("div",{style:{padding:"20px 20px",background:"#FFFFFF",borderBottom:"1px solid #E9E9EB",borderRadius:"8px 8px 0 0"}},/*#__PURE__*/React.createElement("span",{style:{fontSize:18,fontWeight:500,color:"#080908",fontFamily:"'Inter',sans-serif"}},"Account transactions")),/*#__PURE__*/React.createElement("div",{style:{height:80,background:"#FFFFFF",borderBottom:"1px solid #E9E9EB",borderBottom:"1px solid #E9E9EB",display:"flex",alignItems:"center",padding:0}},/*#__PURE__*/React.createElement("div",{style:{position:"relative",width:"100%",height:"100%"}},/*#__PURE__*/React.createElement("svg",{width:18,height:18,viewBox:"0 0 24 24",fill:"none",style:{position:"absolute",left:20,top:"50%",transform:"translateY(-50%)",pointerEvents:"none"}},/*#__PURE__*/React.createElement("circle",{cx:11,cy:11,r:8,stroke:"#8C8C8B",strokeWidth:"1.5"}),/*#__PURE__*/React.createElement("path",{d:"m21 21-4.35-4.35",stroke:"#8C8C8B",strokeWidth:"1.5",strokeLinecap:"round"})),/*#__PURE__*/React.createElement("input",{value:vatAccountSearch,onChange:e=>setVatAccountSearch(e.target.value),placeholder:"Search transactions…",style:{width:"100%",height:"100%",border:"none",borderRadius:0,paddingLeft:52,paddingRight:16,fontSize:14,fontFamily:"'Inter',sans-serif",outline:"none",boxSizing:"border-box",background:"transparent"}}))),/*#__PURE__*/React.createElement(VATAccountTransactionsTable,{externalSearch:vatAccountSearch,reviewCompleted:vatReviewCompleted||false,resolvedCards:vatResolvedCards||new Set(),resolvedRowKeys:new Set(),setResolvedRowKeys:()=>{},ignoredCards:vatIgnoredCards||new Set(),selectedRow:null,setSelectedRow:()=>{}}));
+  const accountTransactionsBlock = /*#__PURE__*/React.createElement("div",{style:{border:"1px solid #E9E9EB",borderRadius:8,overflow:"visible",display:"flex",flexDirection:"column"}},/*#__PURE__*/React.createElement("div",{style:{padding:"20px 20px",background:"#FFFFFF",borderBottom:"1px solid #E9E9EB",borderRadius:"8px 8px 0 0"}},/*#__PURE__*/React.createElement("span",{style:{fontSize:18,fontWeight:500,color:"#080908",fontFamily:"'Inter',sans-serif"}},"Account transactions")),/*#__PURE__*/React.createElement("div",{style:{height:80,background:"#FFFFFF",borderBottom:"1px solid #E9E9EB",borderBottom:"1px solid #E9E9EB",display:"flex",alignItems:"center",padding:0}},/*#__PURE__*/React.createElement("div",{style:{position:"relative",width:"100%",height:"100%"}},/*#__PURE__*/React.createElement("svg",{width:18,height:18,viewBox:"0 0 24 24",fill:"none",style:{position:"absolute",left:20,top:"50%",transform:"translateY(-50%)",pointerEvents:"none"}},/*#__PURE__*/React.createElement("circle",{cx:11,cy:11,r:8,stroke:"#8C8C8B",strokeWidth:"1.5"}),/*#__PURE__*/React.createElement("path",{d:"m21 21-4.35-4.35",stroke:"#8C8C8B",strokeWidth:"1.5",strokeLinecap:"round"})),/*#__PURE__*/React.createElement("input",{value:vatAccountSearch,onChange:e=>setVatAccountSearch(e.target.value),placeholder:"Search transactions…",style:{width:"100%",height:"100%",border:"none",borderRadius:0,paddingLeft:52,paddingRight:16,fontSize:14,fontFamily:"'Inter',sans-serif",outline:"none",boxSizing:"border-box",background:"transparent"}}))),/*#__PURE__*/React.createElement(VATAccountTransactionsTable,{externalSearch:vatAccountSearch,reviewCompleted:v2Done,resolvedCards:v2Resolved,resolvedRowKeys:new Set(),setResolvedRowKeys:()=>{},ignoredCards:v2Ignored,selectedRow:null,setSelectedRow:()=>{},cards:v2ActiveCards,activeGroup:v2Group,onOpenCard:idx=>{const c=v2ActiveCards.find(x=>x.idx===idx);if(c)setV2PreviewCard(c);}}));
   const v2Layout = /*#__PURE__*/React.createElement(React.Fragment, null,
     v2TabBar,
     activeVatTab === "Suggestions" ? /*#__PURE__*/React.createElement(React.Fragment, null, v2WidgetsRow, v2PillsRow,
