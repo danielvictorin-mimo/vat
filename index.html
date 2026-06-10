@@ -5156,12 +5156,20 @@ function MiniCalendar({ value, onChange, placeholder, autoOpen }) {
 
 const ALL_ACCOUNT_NAMES = ["Accounts Payable", "Accruals", "Advertising & Marketing", "Audit & Accountancy fees", "Bank Fees", "Cleaning", "Consulting", "Cost of Goods Sold", "Depreciation Expense", "Direct Expenses", "Direct Wages", "General Expenses", "IT Software and Consumables", "Legal Expenses", "Light, Power, Heating", "Pensions Costs", "Postage, Freight & Courier", "Prepayments", "Printing & Stationery", "Repairs & Maintenance", "Salaries", "Staff Training", "Subscriptions", "Tracking Transfers", "Travel - National", "VAT"];
 
-function VATAccountTransactionsTable({resolvedCards, resolvedRowKeys, setResolvedRowKeys, ignoredCards, selectedRow, setSelectedRow, externalSearch="", reviewCompleted=false, cards=VAT_CARDS, onOpenCard=null, activeGroup="VAT issues"}) {
+// ── Sales transactions for VAT box view (Boxes 1 & 6) ───────────────────────
+const V2_SALES_TX = [
+  { status: "Clear", date: "2 Apr 2026", source: "Receivable Invoice", description: "Acme Ltd \u2014 Invoice paid by Acme Ltd", ref: "INV-00963-B1-1", _account: "Other Revenue (260)", currency: "GBP", debitSrc: 82386.00, creditSrc: null, debitGbp: 82386.00, creditGbp: null, running: null, vat: "20% (VAT on Income)" },
+  { status: "Clear", date: "2 Apr 2026", source: "Receivable Invoice", description: "Globex Corp \u2014 Invoice paid by Globex Corp", ref: "INV-00963-B1-3", _account: "Sales (200)", currency: "GBP", debitSrc: 82386.00, creditSrc: null, debitGbp: 82386.00, creditGbp: null, running: null, vat: "20% (VAT on Income)" },
+  { status: "Clear", date: "9 May 2026", source: "Receivable Invoice", description: "Initech Solutions \u2014 Monthly retainer", ref: "INV-00987-B1-2", _account: "Sales (200)", currency: "GBP", debitSrc: 12450.00, creditSrc: null, debitGbp: 12450.00, creditGbp: null, running: null, vat: "20% (VAT on Income)" },
+  { status: "Clear", date: "28 May 2026", source: "Receivable Invoice", description: "Umbrella Retail \u2014 Wholesale order (export)", ref: "INV-01002-B1-4", _account: "Sales (200)", currency: "GBP", debitSrc: 6230.00, creditSrc: null, debitGbp: 6230.00, creditGbp: null, running: null, vat: "Zero Rated Income" }
+];
+function VATAccountTransactionsTable({resolvedCards, resolvedRowKeys, setResolvedRowKeys, ignoredCards, selectedRow, setSelectedRow, externalSearch="", reviewCompleted=false, cards=VAT_CARDS, onOpenCard=null, activeGroup="VAT issues", groupMode="account"}) {
   const CARD_ROWS = (cards || []).map((c, ci) => {
     const tr = c.tableRow || {};
     const amt = parseFloat(String(tr["Amount"] || "0").replace(/[\u00a3,]/g, "")) || 0;
     const marked = activeGroup === "Miscodings" ? c.cat === "miscoding" : c.cat !== "miscoding";
-    return { status: marked ? ([1, 12, 101, 104].includes(c.idx) ? "Priority" : "Review") : "Clear", date: tr["Date"] || "", source: "Payable Invoice",
+    const done = (resolvedCards && resolvedCards.has(c.idx)) || (ignoredCards && ignoredCards.has(c.idx));
+    return { status: done || !marked ? "Clear" : [1, 12, 101, 104].includes(c.idx) ? "Priority" : "Review", date: tr["Date"] || "", source: "Payable Invoice",
       description: c.contact + (c.invoiceLineDesc ? " \u2014 " + c.invoiceLineDesc : ""), ref: "INV-" + (2600 + c.idx), currency: "GBP",
       debitSrc: null, creditSrc: amt, debitGbp: null, creditGbp: amt, running: null,
       vat: (typeof tr["VAT rate name"] === "object" && tr["VAT rate name"] ? tr["VAT rate name"].text : tr["VAT rate name"]) || "",
@@ -5237,7 +5245,7 @@ function VATAccountTransactionsTable({resolvedCards, resolvedRowKeys, setResolve
   return React.createElement("div", {style:{display:"flex",flexDirection:"column"}},
 
 
-    React.createElement("div", {style:{display:"flex",alignItems:"center",padding:"0 16px",height:80,gap:8,borderBottom:"1px solid #E9E9EB"}},
+    (groupMode !== "vatbox" || reviewCompleted) && React.createElement("div", {style:{display:"flex",alignItems:"center",padding:"0 16px",height:80,gap:8,borderBottom:"1px solid #E9E9EB"}},
       reviewCompleted && React.createElement(React.Fragment, null,
         ["Priority","Review","Clear"].map(opt => {
           const isActive = statusFilterSet.has(opt);
@@ -5252,7 +5260,7 @@ function VATAccountTransactionsTable({resolvedCards, resolvedRowKeys, setResolve
           );
         })
       ),
-      /*#__PURE__*/React.createElement("div", {
+      groupMode !== "vatbox" && /*#__PURE__*/React.createElement("div", {
     style: {
       position: "relative"
     }
@@ -5477,7 +5485,7 @@ function VATAccountTransactionsTable({resolvedCards, resolvedRowKeys, setResolve
         color: "#080908"
       }
     }, opt));
-  })))),/*#__PURE__*/React.createElement("div", {style:{position:"relative"}},
+  })))),groupMode !== "vatbox" && /*#__PURE__*/React.createElement("div", {style:{position:"relative"}},
   /*#__PURE__*/React.createElement("button", {
     ref: colsFilterBtnRef,
     onClick: () => setColsFilterOpen(o => !o),
@@ -5548,7 +5556,7 @@ function VATAccountTransactionsTable({resolvedCards, resolvedRowKeys, setResolve
       );
     })()
   )
-),/*#__PURE__*/React.createElement("div",{ref:groupByDropRef,style:{position:"relative"}},
+),groupMode !== "vatbox" && /*#__PURE__*/React.createElement("div",{ref:groupByDropRef,style:{position:"relative"}},
   /*#__PURE__*/React.createElement("button",{onClick:()=>setGroupByDropOpen(o=>!o),style:{display:"inline-flex",alignItems:"center",gap:6,height:40,padding:"0 12px",border:"1px solid #E9E9EB",borderRadius:8,background:groupByDropOpen?"#F5F5F5":"#FFFFFF",cursor:"pointer",fontSize:14,fontWeight:500,color:"#080908",fontFamily:"'Inter', sans-serif"},ref:groupByBtnRef,onMouseEnter:e=>{if(!groupByDropOpen)e.currentTarget.style.background="#F5F5F5";},onMouseLeave:e=>{if(!groupByDropOpen)e.currentTarget.style.background="#FFFFFF";}},
     /*#__PURE__*/React.createElement("span",{style:{color:"#000",fontSize:14,fontWeight:500}},groupByContact?"Group by contact":"Group by accounts"),
     /*#__PURE__*/React.createElement("svg",{width:"14",height:"14",viewBox:"0 0 16 16",fill:"none",style:{transition:"transform 0.2s",transform:groupByDropOpen?"rotate(180deg)":"rotate(0deg)"}},
@@ -5610,6 +5618,61 @@ function VATAccountTransactionsTable({resolvedCards, resolvedRowKeys, setResolve
     const TX_PAGED = _flat.slice((TX_SAFE_PAGE-1)*txPageSize, TX_SAFE_PAGE*txPageSize);
     const _paged = {}; TX_PAGED.forEach(r => { if(!_paged[r._section])_paged[r._section]=[]; _paged[r._section].push(r); });
     const ACCOUNT_TX = VAT_ACCOUNT_TX.map(sec => ({...sec, rows: _paged[sec.account]||[]})).filter(s=>s.rows.length>0);
+    const VATBOX_SECTIONS = groupMode !== "vatbox" ? null : (() => {
+      const vatAmtOf = r => ((r.vat || "").includes("20%") ? Math.round((r.creditGbp || r.debitGbp || 0) * 20) / 100 : 0);
+      const netOf = r => (r.creditGbp || r.debitGbp || 0);
+      const fmtMoney = n => n.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      let sales = V2_SALES_TX;
+      if (statusFilterSet.size > 0) sales = sales.filter(r => statusFilterSet.has(r.status));
+      if (externalSearch) sales = sales.filter(r => (r.description || "").toLowerCase().includes(externalSearch.toLowerCase()) || (r.vat || "").toLowerCase().includes(externalSearch.toLowerCase()));
+      const expenses = _flat;
+      const BOXES = [
+        { box: 1, label: "VAT due in the period on sales and other outputs", rows: sales.filter(r => vatAmtOf(r) > 0), total: sales.reduce((a, r) => a + vatAmtOf(r), 0) },
+        { box: 4, label: "VAT reclaimed in the period on purchases and other inputs", rows: expenses.filter(r => vatAmtOf(r) > 0), total: expenses.reduce((a, r) => a + vatAmtOf(r), 0) },
+        { box: 6, label: "Total value of sales and all other outputs excluding any VAT", rows: sales, total: sales.reduce((a, r) => a + netOf(r), 0) },
+        { box: 7, label: "Total value of purchases and all other inputs excluding any VAT", rows: expenses, total: expenses.reduce((a, r) => a + netOf(r), 0) }
+      ];
+      const out = [];
+      BOXES.forEach(b => {
+        const byRate = {};
+        b.rows.forEach(r => { const k = r.vat || "No VAT"; (byRate[k] = byRate[k] || []).push(r); });
+        Object.keys(byRate).forEach((rate, i) => out.push({ account: rate, opening: null, rows: byRate[rate], _boxKey: b.box, _boxHeader: i === 0 ? { box: b.box, label: b.label, total: fmtMoney(b.total) } : null }));
+      });
+      return out;
+    })();
+    if (groupMode === "vatbox") {
+      const vatAmtOf = r => ((r.vat || "").includes("20%") ? Math.round((r.creditGbp || r.debitGbp || 0) * 20) / 100 : 0);
+      const netOf = r => (r.creditGbp || r.debitGbp || 0);
+      const fmt2 = n => n.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const VB_COLS = "150px 130px 220px 200px 1fr 140px 150px";
+      const vbCell = (content, ci, opts) => /*#__PURE__*/React.createElement("div", { style: Object.assign({ display: "flex", alignItems: "center", padding: "12px 16px", fontSize: 14, color: "#080908", lineHeight: "20px", borderRight: ci < 6 ? "1px solid #E9E9EB" : "none", minWidth: 0, overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" }, opts) }, content);
+      const vbStatusBadge = st => {
+        const sty = st === "Priority" ? { background: "#F9E2DE", color: "#C8543A" } : st === "Review" ? { background: "#FDF8EE", color: "#D5A750" } : { background: reviewCompleted ? "#F1F8F0" : "#F5F5F5", color: reviewCompleted ? "#05A105" : "#545453" };
+        return /*#__PURE__*/React.createElement("span", { style: { fontSize: 12, fontWeight: 500, padding: "2px 8px", borderRadius: 4, background: sty.background, color: sty.color, whiteSpace: "nowrap" } }, st === "Priority" ? "Critical" : st === "Review" ? "Attention" : reviewCompleted ? "Clear" : "Pending review");
+      };
+      return /*#__PURE__*/React.createElement("div", { style: { background: "#FFFFFF" } },
+        VATBOX_SECTIONS.map((section, si) => /*#__PURE__*/React.createElement(React.Fragment, { key: "b" + section._boxKey + "-" + section.account },
+          section._boxHeader && /*#__PURE__*/React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 12, padding: "0 16px", height: 64, borderBottom: "1px solid #E9E9EB", background: "#FFFFFF" } },
+            /*#__PURE__*/React.createElement("span", { style: { height: 33, padding: "8px 12px", boxSizing: "border-box", display: "inline-flex", alignItems: "center", borderRadius: 6, background: "#ECECEC", fontSize: 13, fontWeight: 500, color: "#545453", flexShrink: 0 } }, "Box " + section._boxHeader.box),
+            /*#__PURE__*/React.createElement("span", { style: { fontSize: 16, fontWeight: 500, color: "#080908", flex: 1, letterSpacing: "-0.1px" } }, section._boxHeader.label),
+            /*#__PURE__*/React.createElement("span", { style: { fontSize: 16, fontWeight: 500, color: "#080908" } }, section._boxHeader.total)),
+          /*#__PURE__*/React.createElement("div", { style: { display: "flex", alignItems: "center", height: 56, padding: "0 16px", fontSize: 16, fontWeight: 500, color: "#080908", letterSpacing: "-0.1px", background: "#FAFAFA", borderBottom: "1px solid #E9E9EB" } }, section.account),
+          /*#__PURE__*/React.createElement("div", { style: { display: "grid", gridTemplateColumns: VB_COLS, background: "#FFFFFF", borderBottom: "1px solid #E9E9EB" } },
+            ["Status", "Date", "Account", "Reference", "Details", "VAT", "Net"].map((h, hi) => /*#__PURE__*/React.createElement("div", { key: h, style: { display: "flex", alignItems: "center", height: 48, padding: "0 16px", fontSize: 14, fontWeight: 400, color: "#7C7C7C", borderRight: hi < 6 ? "1px solid #E9E9EB" : "none", whiteSpace: "nowrap", justifyContent: hi >= 5 ? "flex-end" : "flex-start" } }, h))),
+          section.rows.map((r, ri) => /*#__PURE__*/React.createElement("div", { key: ri,
+            onClick: r.cardIdx != null && onOpenCard ? () => onOpenCard(r.cardIdx) : undefined,
+            style: { display: "grid", gridTemplateColumns: VB_COLS, borderBottom: "1px solid #E9E9EB", background: r.status === "Priority" ? "#FDF1F0" : "#FFFFFF", transition: "background 0.1s", cursor: r.cardIdx != null && onOpenCard ? "pointer" : "default" },
+            onMouseEnter: e => { if (r.status !== "Priority") e.currentTarget.style.background = "#FAFAFA"; },
+            onMouseLeave: e => e.currentTarget.style.background = r.status === "Priority" ? "#FDF1F0" : "#FFFFFF" },
+            vbCell(vbStatusBadge(r.status || "Clear"), 0, null),
+            vbCell(r.date, 1, null),
+            vbCell(r._account || r._section || "\u2014", 2, null),
+            vbCell(r.ref, 3, null),
+            vbCell(r.description, 4, null),
+            vbCell(fmt2(vatAmtOf(r)), 5, { justifyContent: "flex-end" }),
+            vbCell(fmt2(netOf(r)), 6, { justifyContent: "flex-end" })))
+        )));
+    }
     const STATUS_STYLES = {
       Priority: {
         background: "#F9E2DE",
@@ -5864,8 +5927,8 @@ function VATAccountTransactionsTable({resolvedCards, resolvedRowKeys, setResolve
         width: "100%",
         minWidth: minTblWidth
       }
-    }, (groupByContact ? (()=>{const cg={};ACCOUNT_TX.forEach(sec=>{sec.rows.forEach(row=>{const d=row.description||"";const em=d.indexOf(" — ");const contact=em>0?d.substring(0,em).trim():(d.split(":")[0]||sec.account).trim();if(!cg[contact])cg[contact]={account:contact,opening:null,rows:[]};cg[contact].rows.push(row);});});const NON_CONTACTS=new Set(["Accrual", "Accrual reversal", "Accrual reversal for May 26", "Administration salaries", "Bill paid to Amazon Business - BILL-17007-36", "Employer pension contributions", "FX conversion fee", "Insurance prepayment", "Inter-account transfer", "Monthly depreciation", "Payment", "Prepayment release", "Production team", "VAT control", "Wire transfer fee"]);return Object.values(cg).filter(g=>!NON_CONTACTS.has(g.account)).sort((a,b)=>{const pa=a.rows.filter(r=>r.status==="Priority").length;const pb=b.rows.filter(r=>r.status==="Priority").length;if(pb!==pa)return pb-pa;const ra=a.rows.filter(r=>r.status==="Review").length;const rb=b.rows.filter(r=>r.status==="Review").length;return rb-ra||a.account.localeCompare(b.account);});})():ACCOUNT_TX.slice().sort((a,b)=>{const pa=a.rows.filter(r=>r.status==="Priority").length;const pb=b.rows.filter(r=>r.status==="Priority").length;if(pb!==pa)return pb-pa;const ra=a.rows.filter(r=>r.status==="Review").length;const rb=b.rows.filter(r=>r.status==="Review").length;return rb-ra||a.account.localeCompare(b.account);})).map((section, si) => {
-      if (accountFilterSet.size > 0 && !accountFilterSet.has(section.account)) return null;
+    }, (groupMode === "vatbox" ? VATBOX_SECTIONS : groupByContact ? (()=>{const cg={};ACCOUNT_TX.forEach(sec=>{sec.rows.forEach(row=>{const d=row.description||"";const em=d.indexOf(" — ");const contact=em>0?d.substring(0,em).trim():(d.split(":")[0]||sec.account).trim();if(!cg[contact])cg[contact]={account:contact,opening:null,rows:[]};cg[contact].rows.push(row);});});const NON_CONTACTS=new Set(["Accrual", "Accrual reversal", "Accrual reversal for May 26", "Administration salaries", "Bill paid to Amazon Business - BILL-17007-36", "Employer pension contributions", "FX conversion fee", "Insurance prepayment", "Inter-account transfer", "Monthly depreciation", "Payment", "Prepayment release", "Production team", "VAT control", "Wire transfer fee"]);return Object.values(cg).filter(g=>!NON_CONTACTS.has(g.account)).sort((a,b)=>{const pa=a.rows.filter(r=>r.status==="Priority").length;const pb=b.rows.filter(r=>r.status==="Priority").length;if(pb!==pa)return pb-pa;const ra=a.rows.filter(r=>r.status==="Review").length;const rb=b.rows.filter(r=>r.status==="Review").length;return rb-ra||a.account.localeCompare(b.account);});})():ACCOUNT_TX.slice().sort((a,b)=>{const pa=a.rows.filter(r=>r.status==="Priority").length;const pb=b.rows.filter(r=>r.status==="Priority").length;if(pb!==pa)return pb-pa;const ra=a.rows.filter(r=>r.status==="Review").length;const rb=b.rows.filter(r=>r.status==="Review").length;return rb-ra||a.account.localeCompare(b.account);})).map((section, si) => {
+      if (groupMode !== "vatbox" && accountFilterSet.size > 0 && !accountFilterSet.has(section.account)) return null;
       const effectiveStatus = row => resolvedRowKeys.has(`${si}-${row._ri}`) || row.cardIdx != null && (resolvedCards.has(row.cardIdx) || ignoredCards.has(row.cardIdx)) ? "Clear" : row.status;
       const rowsWithRi = section.rows.map((row, ri) => Object.assign({}, row, {
         _ri: ri,
@@ -5874,8 +5937,11 @@ function VATAccountTransactionsTable({resolvedCards, resolvedRowKeys, setResolve
       const filteredRows = rowsWithRi.filter(row => (statusFilterSet.size === 0 || statusFilterSet.has(effectiveStatus(row))) && (suggTypeFilterSet.size === 0 || (row.cardIdx != null && row.status !== "Clear   " && row.status !== "Clear" && suggTypeFilterSet.has((VAT_CARDS.find(c=>c.idx===row.cardIdx)||{}).cat==="miscoding"?"Miscodings":"VAT"))) && (!(tableSearch||externalSearch) || [row.description, row.ref, row.source, row.date, row.currency, row.vat].some(v => v && String(v).toLowerCase().includes((tableSearch||externalSearch).toLowerCase()))));
       const STATUS_SORT={Priority:0,Critical:0,Review:1,Attention:1,Clear:2};const sortedRows=filteredRows.slice().sort((a,b)=>(STATUS_SORT[effectiveStatus(a)]??3)-(STATUS_SORT[effectiveStatus(b)]??3));if (sortedRows.length === 0) return null;
       return /*#__PURE__*/React.createElement(React.Fragment, {
-        key: section.account
-      }, /*#__PURE__*/React.createElement("div", {
+        key: (section._boxKey != null ? "b" + section._boxKey + "-" : "") + section.account
+      }, section._boxHeader && /*#__PURE__*/React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 12, padding: "20px 16px", borderBottom: "1px solid #E9E9EB", background: "#FFFFFF" } },
+        /*#__PURE__*/React.createElement("span", { style: { height: 33, padding: "8px 12px", boxSizing: "border-box", display: "inline-flex", alignItems: "center", borderRadius: 6, background: "#ECECEC", fontSize: 13, fontWeight: 500, color: "#545453", flexShrink: 0 } }, "Box " + section._boxHeader.box),
+        /*#__PURE__*/React.createElement("span", { style: { fontSize: 16, fontWeight: 600, color: "#080908", flex: 1 } }, section._boxHeader.label),
+        /*#__PURE__*/React.createElement("span", { style: { fontSize: 16, fontWeight: 600, color: "#080908" } }, section._boxHeader.total)), /*#__PURE__*/React.createElement("div", {
         style: {
           display: "grid",
           gridTemplateColumns: gridTpl,
@@ -6232,7 +6298,7 @@ function VATAccountTransactionsTable({resolvedCards, resolvedRowKeys, setResolve
     }));
   })()
   ,
-  React.createElement("div", {style:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 16px",height:64,borderTop:"1px solid #E9E9EB",background:"#FFFFFF",fontSize:14,color:"#000",fontFamily:"'Inter',sans-serif",borderRadius:"0 0 8px 8px"}},
+  groupMode !== "vatbox" && React.createElement("div", {style:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 16px",height:64,borderTop:"1px solid #E9E9EB",background:"#FFFFFF",fontSize:14,color:"#000",fontFamily:"'Inter',sans-serif",borderRadius:"0 0 8px 8px"}},
     React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},
       React.createElement("span",null,TX_TOTAL+" transactions"),
       React.createElement("div",{ref:txPageSizeDropRef,style:{position:"relative"}},
@@ -6324,7 +6390,7 @@ function VATReviewPage({
   const vatResolvedCount = vatResolvedCards.size + vatIgnoredCards.size;
   const [activeVatTab, setActiveVatTab] = useState(isV2 ? "Suggestions" : "Account transactions");
   const [v2Group, setV2Group] = useState("VAT issues");
-  const [v2Filter, setV2Filter] = useState("Suggestions");
+  const [v2Filter, setV2Filter] = useState("Suggestion cards");
   const [v2FilterOpen, setV2FilterOpen] = useState(false);
   const [v2Collapsed, setV2Collapsed] = useState(() => new Set());
   const [v2CardsReady, setV2CardsReady] = useState(!!vatReviewCompleted);
@@ -6380,7 +6446,7 @@ function VATReviewPage({
   useEffect(() => {
     setActiveVatTab(isV2 ? "Suggestions" : "Account transactions");
     setV2Group("VAT issues");
-    setV2Filter("Suggestions");
+    setV2Filter("Suggestion cards");
     setV2SelectedRun("Current");
   }, [isV2]);
   const [vatAccountSearch, setVatAccountSearch] = useState("");
@@ -7582,7 +7648,7 @@ function VATReviewPage({
     v2Group === "VAT issues" ? "No VAT issues" : "No miscodings",
     v2Done
       ? (v2Group === "VAT issues" ? "All VAT issues have been resolved" : "All miscodings have been resolved")
-      : (v2Group === "VAT issues" ? "Run a bookkeeping review to check for VAT issues" : "Run a bookkeeping review to check for miscodings"));
+      : (v2Group === "VAT issues" ? "Run a VAT & Miscodings review to check for VAT issues" : "Run a VAT & Miscodings review to check for miscodings"));
   // ── Sub-render (v2): suggestion cards (post-review, per Figma 2721:70174) ──
   const v2Severity = idx => [1, 12, 101, 104].includes(idx) ? { label: "Critical", bg: "#FCEFEC", color: "#C8543A" } : { label: "Attention", bg: "#FDF8EE", color: "#D5A750" };
   const v2CardRows = card => {
@@ -7686,19 +7752,20 @@ function VATReviewPage({
       style: { height: 40, padding: "0 12px", borderRadius: 8, border: "1px solid #E9E9EB", background: v2FilterOpen ? "#F5F5F5" : "#FFFFFF", cursor: "pointer", fontSize: 14, fontWeight: 500, color: "#080908", display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "'Inter', sans-serif" },
       onMouseEnter: e => { if (!v2FilterOpen) e.currentTarget.style.background = "#F5F5F5"; },
       onMouseLeave: e => { if (!v2FilterOpen) e.currentTarget.style.background = "#FFFFFF"; } },
+      /*#__PURE__*/React.createElement("span", { style: { color: "#7C7C7C", fontWeight: 400 } }, "View as"),
       v2Filter,
       /*#__PURE__*/React.createElement("svg", { width: 16, height: 16, viewBox: "0 0 16 16", fill: "none", style: { transition: "transform 0.2s", transform: v2FilterOpen ? "rotate(180deg)" : "rotate(0deg)" } },
         /*#__PURE__*/React.createElement("path", { d: "M4 6L8 10L12 6", stroke: "#080908", strokeWidth: "1.25", strokeLinecap: "round", strokeLinejoin: "round" }))),
     v2FilterOpen && /*#__PURE__*/React.createElement(React.Fragment, null,
       /*#__PURE__*/React.createElement("div", { onClick: () => setV2FilterOpen(false), style: { position: "fixed", top: 0, right: 0, bottom: 0, left: 0, zIndex: 999 } }),
-      /*#__PURE__*/React.createElement("div", { style: { position: "absolute", top: "calc(100% + 6px)", right: 0, background: "#FFFFFF", border: "1px solid #E9E9EB", borderRadius: 12, boxShadow: "0 8px 24px rgba(0,0,0,0.10)", zIndex: 1000, minWidth: 220, padding: 6, fontFamily: "'Inter', sans-serif" } },
-        ["Suggestions", "Account transactions"].map(opt => {
+      /*#__PURE__*/React.createElement("div", { style: { position: "absolute", top: "calc(100% + 6px)", right: 0, background: "#FFFFFF", border: "1px solid #E9E9EB", borderRadius: 12, boxShadow: "0 8px 24px rgba(0,0,0,0.10)", zIndex: 1000, minWidth: 260, width: "max-content", padding: 6, fontFamily: "'Inter', sans-serif" } },
+        ["Suggestion cards", "Account transactions", "Transactions by VAT box"].map(opt => {
           const selected = v2Filter === opt;
           return /*#__PURE__*/React.createElement("label", { key: opt,
             style: { display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", cursor: "pointer", borderRadius: 6, background: "transparent", fontFamily: "'Inter', sans-serif" },
             onMouseEnter: e => { if (!selected) e.currentTarget.style.background = "#FAFAFA"; }, onMouseLeave: e => { if (!selected) e.currentTarget.style.background = "transparent"; } },
-            /*#__PURE__*/React.createElement("input", { type: "radio", name: "v2FilterOpt", value: opt, checked: selected, onChange: () => { setV2Filter(opt); setV2FilterOpen(false); }, style: { accentColor: "#05A105", width: 16, height: 16, cursor: "pointer" } }),
-            /*#__PURE__*/React.createElement("span", { style: { fontSize: 14, color: "#080908" } }, opt));
+            /*#__PURE__*/React.createElement("input", { type: "radio", name: "v2FilterOpt", value: opt, checked: selected, onChange: () => { setV2Filter(opt); setV2FilterOpen(false); }, style: { accentColor: "#05A105", width: 16, height: 16, cursor: "pointer", flexShrink: 0 } }),
+            /*#__PURE__*/React.createElement("span", { style: { fontSize: 14, color: "#080908", whiteSpace: "nowrap" } }, opt));
         }))));
   const v2PillsRow = /*#__PURE__*/React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8 } }, v2Pills, v2FilterDropdown);
   const v2GroupCards = v2ActiveCards.filter(c => v2Group === "Miscodings" ? c.cat === "miscoding" : c.cat !== "miscoding");
@@ -7731,16 +7798,16 @@ function VATReviewPage({
       onDelete: () => setV2PreviewCard(null), onArchive: () => setV2PreviewCard(null), onKeep: () => setV2PreviewCard(null)
     });
   })();
-  const accountTransactionsBlock = /*#__PURE__*/React.createElement("div",{style:{border:"1px solid #E9E9EB",borderRadius:8,overflow:"visible",display:"flex",flexDirection:"column"}},/*#__PURE__*/React.createElement("div",{style:{padding:"20px 20px",background:"#FFFFFF",borderBottom:"1px solid #E9E9EB",borderRadius:"8px 8px 0 0"}},/*#__PURE__*/React.createElement("span",{style:{fontSize:18,fontWeight:500,color:"#080908",fontFamily:"'Inter',sans-serif"}},"Account transactions")),/*#__PURE__*/React.createElement("div",{style:{height:80,background:"#FFFFFF",borderBottom:"1px solid #E9E9EB",borderBottom:"1px solid #E9E9EB",display:"flex",alignItems:"center",padding:0}},/*#__PURE__*/React.createElement("div",{style:{position:"relative",width:"100%",height:"100%"}},/*#__PURE__*/React.createElement("svg",{width:18,height:18,viewBox:"0 0 24 24",fill:"none",style:{position:"absolute",left:20,top:"50%",transform:"translateY(-50%)",pointerEvents:"none"}},/*#__PURE__*/React.createElement("circle",{cx:11,cy:11,r:8,stroke:"#8C8C8B",strokeWidth:"1.5"}),/*#__PURE__*/React.createElement("path",{d:"m21 21-4.35-4.35",stroke:"#8C8C8B",strokeWidth:"1.5",strokeLinecap:"round"})),/*#__PURE__*/React.createElement("input",{value:vatAccountSearch,onChange:e=>setVatAccountSearch(e.target.value),placeholder:"Search transactions…",style:{width:"100%",height:"100%",border:"none",borderRadius:0,paddingLeft:52,paddingRight:16,fontSize:14,fontFamily:"'Inter',sans-serif",outline:"none",boxSizing:"border-box",background:"transparent"}}))),/*#__PURE__*/React.createElement(VATAccountTransactionsTable,{externalSearch:vatAccountSearch,reviewCompleted:v2Done,resolvedCards:v2Resolved,resolvedRowKeys:new Set(),setResolvedRowKeys:()=>{},ignoredCards:v2Ignored,selectedRow:null,setSelectedRow:()=>{},cards:v2ActiveCards,activeGroup:v2Group,onOpenCard:idx=>{const c=v2ActiveCards.find(x=>x.idx===idx);if(c)setV2PreviewCard(c);}}));
+  const accountTransactionsBlock = /*#__PURE__*/React.createElement("div",{style:{border:"1px solid #E9E9EB",borderRadius:8,overflow:"visible",display:"flex",flexDirection:"column"}},/*#__PURE__*/React.createElement("div",{style:{padding:"20px 20px",background:"#FFFFFF",borderBottom:"1px solid #E9E9EB",borderRadius:"8px 8px 0 0"}},/*#__PURE__*/React.createElement("span",{style:{fontSize:18,fontWeight:500,color:"#080908",fontFamily:"'Inter',sans-serif"}},v2Filter==="Transactions by VAT box"?"Transactions by VAT box":"Account transactions")),/*#__PURE__*/React.createElement("div",{style:{height:80,background:"#FFFFFF",borderBottom:"1px solid #E9E9EB",borderBottom:"1px solid #E9E9EB",display:"flex",alignItems:"center",padding:0}},/*#__PURE__*/React.createElement("div",{style:{position:"relative",width:"100%",height:"100%"}},/*#__PURE__*/React.createElement("svg",{width:18,height:18,viewBox:"0 0 24 24",fill:"none",style:{position:"absolute",left:20,top:"50%",transform:"translateY(-50%)",pointerEvents:"none"}},/*#__PURE__*/React.createElement("circle",{cx:11,cy:11,r:8,stroke:"#8C8C8B",strokeWidth:"1.5"}),/*#__PURE__*/React.createElement("path",{d:"m21 21-4.35-4.35",stroke:"#8C8C8B",strokeWidth:"1.5",strokeLinecap:"round"})),/*#__PURE__*/React.createElement("input",{value:vatAccountSearch,onChange:e=>setVatAccountSearch(e.target.value),placeholder:"Search transactions…",style:{width:"100%",height:"100%",border:"none",borderRadius:0,paddingLeft:52,paddingRight:16,fontSize:14,fontFamily:"'Inter',sans-serif",outline:"none",boxSizing:"border-box",background:"transparent"}}))),/*#__PURE__*/React.createElement(VATAccountTransactionsTable,{externalSearch:vatAccountSearch,reviewCompleted:v2Done,resolvedCards:v2Resolved,resolvedRowKeys:new Set(),setResolvedRowKeys:()=>{},ignoredCards:v2Ignored,selectedRow:null,setSelectedRow:()=>{},cards:v2ActiveCards,activeGroup:v2Group,groupMode:v2Filter==="Transactions by VAT box"?"vatbox":"account",onOpenCard:idx=>{const c=v2ActiveCards.find(x=>x.idx===idx);if(c)setV2PreviewCard(c);}}));
   const v2Layout = /*#__PURE__*/React.createElement(React.Fragment, null,
     v2TabBar,
     activeVatTab === "Suggestions" ? /*#__PURE__*/React.createElement(React.Fragment, null, v2WidgetsRow, v2PillsRow,
-      v2Filter === "Account transactions" ? accountTransactionsBlock :
+      v2RunCompleted && !v2Ready ? v2CanvasLoading :
+      v2Filter !== "Suggestion cards" ? accountTransactionsBlock :
       !v2RunCompleted ? v2GroupEmpty :
-      !v2Ready ? v2CanvasLoading :
       v2GroupCards.length ? v2SuggestionsList : v2GroupEmpty) :
     activeVatTab === "VAT Return" ? vatReturnTable :
-    v2HeaderRunsVisible ? /*#__PURE__*/React.createElement(ProfitVATChart, null) : v2EmptyCard("No costs & revenue data", "Run a bookkeeping review to see costs and revenue insights", "M21 21H4.6C4.03995 21 3.75992 21 3.54601 20.891C3.35785 20.7951 3.20487 20.6422 3.10899 20.454C3 20.2401 3 19.9601 3 19.4V3M20 8L16.0811 12.1827C15.9326 12.3412 15.8584 12.4204 15.7688 12.4614C15.6897 12.4976 15.6026 12.5125 15.516 12.5047C15.4179 12.4958 15.3215 12.4458 15.1287 12.3457L11.8713 10.6543C11.6785 10.5542 11.5821 10.5042 11.484 10.4953C11.3974 10.4875 11.3103 10.5024 11.2312 10.5386C11.1416 10.5796 11.0674 10.6588 10.9189 10.8173L7 15"),
+    v2HeaderRunsVisible ? /*#__PURE__*/React.createElement(ProfitVATChart, null) : v2EmptyCard("No costs & revenue data", "Run a VAT & Miscodings review to see costs and revenue insights", "M21 21H4.6C4.03995 21 3.75992 21 3.54601 20.891C3.35785 20.7951 3.20487 20.6422 3.10899 20.454C3 20.2401 3 19.9601 3 19.4V3M20 8L16.0811 12.1827C15.9326 12.3412 15.8584 12.4204 15.7688 12.4614C15.6897 12.4976 15.6026 12.5125 15.516 12.5047C15.4179 12.4958 15.3215 12.4458 15.1287 12.3457L11.8713 10.6543C11.6785 10.5542 11.5821 10.5042 11.484 10.4953C11.3974 10.4875 11.3103 10.5024 11.2312 10.5386C11.1416 10.5796 11.0674 10.6588 10.9189 10.8173L7 15"),
     v2PreviewPanel);
 
   return /*#__PURE__*/React.createElement(React.Fragment, null, reviewSidebar, setupModal, /*#__PURE__*/React.createElement("div", {
